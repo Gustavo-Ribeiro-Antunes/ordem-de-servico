@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Ordem de Serviço – Antunes Lift Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #C8102E;
+    --dark: #1a1a2e;
+    --darker: #0f0f1a;
+    --mid: #2a2a40;
+    --light-bg: #f4f6fa;
+    --border: #d0d5e8;
+    --text: #1e1e2e;
+    --muted: #6b7280;
+    --white: #ffffff;
+    --section-bg: #1a1a2e;
+    --section-text: #ffffff;
+    --input-bg: #ffffff;
+    --focus: #C8102E;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--light-bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--dark);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  }
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-box {
+    background: var(--red);
+    width: 36px; height: 36px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800; color: white; font-size: 18px;
+  }
+  .logo-text { color: white; }
+  .logo-text strong { display: block; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: 1px; }
+  .logo-text span { font-size: 10px; color: #aab; letter-spacing: 2px; text-transform: uppercase; }
+  .header-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px; font-weight: 800;
+    color: white; letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ACTIONS BAR */
+  .actions-bar {
+    background: var(--red);
+    padding: 10px 16px;
+    display: flex; gap: 8px; justify-content: flex-end;
+    position: sticky; top: 68px; z-index: 99;
+  }
+  .btn {
+    padding: 9px 18px;
+    border-radius: 6px;
+    font-family: 'Barlow', sans-serif;
+    font-weight: 700; font-size: 13px;
+    border: none; cursor: pointer;
+    transition: all .15s;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+  .btn-primary { background: white; color: var(--red); }
+  .btn-primary:active { background: #ffe0e4; }
+  .btn-ghost { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.4); }
+  .btn-ghost:active { background: rgba(255,255,255,0.3); }
+  .btn-dark { background: var(--dark); color: white; }
+
+  /* FORM */
+  .form-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 0 12px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+
+  .card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border: 1px solid var(--border);
+  }
+
+  .section-header {
+    background: var(--dark);
+    color: white;
+    padding: 10px 16px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-header .dot { width: 6px; height: 6px; background: var(--red); border-radius: 50%; }
+
+  .fields { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
+  .field.w100 { flex: 0 0 100%; }
+  .field.w50 { flex: 0 0 calc(50% - 5px); }
+  .field.w33 { flex: 0 0 calc(33.3% - 7px); }
+  .field.w66 { flex: 0 0 calc(66.6% - 5px); }
+
+  label {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .8px;
+  }
+
+  input[type="text"], input[type="date"], input[type="time"], input[type="number"], select, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px; color: var(--text);
+    background: var(--input-bg);
+    -webkit-appearance: none;
+    transition: border-color .15s;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--red); }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+  /* OS NUMBER HIGHLIGHT */
+  .os-number-input {
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    font-family: 'Barlow Condensed', sans-serif !important;
+    letter-spacing: 2px;
+    color: var(--red) !important;
+  }
+
+  /* CHECKBOXES */
+  .check-group { display: flex; flex-wrap: wrap; gap: 10px; padding: 12px 16px; }
+  .check-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .15s;
+    user-select: none;
+    font-size: 14px; font-weight: 500;
+    background: white;
+  }
+  .check-item input[type="checkbox"] { display: none; }
+  .check-box {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all .15s;
+  }
+  .check-item input:checked ~ .check-label { color: var(--red); font-weight: 700; }
+  .check-item.checked { border-color: var(--red); background: #fff5f6; }
+  .check-item.checked .check-box { background: var(--red); border-color: var(--red); }
+  .check-item.checked .check-box::after { content: '✓'; color: white; font-size: 11px; font-weight: 900; }
+
+  /* TWO COLUMNS SECTION */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; }
+  .two-col-item { padding: 14px 16px; }
+  .two-col-item:first-child { border-right: 1px solid var(--border); }
+  .two-col-header {
+    background: var(--mid);
+    color: white;
+    display: grid; grid-template-columns: 1fr 1fr;
+  }
+  .two-col-header .section-header { border-radius: 0; }
+  .two-col-header .section-header:first-child { border-right: 1px solid rgba(255,255,255,0.15); }
+
+  /* PECAS TABLE */
+  .parts-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 60px 1fr 1fr;
+    gap: 0;
+    padding: 8px 16px;
+    background: #f0f2f8;
+    border-bottom: 1px solid var(--border);
+  }
+  .parts-header span {
+    font-size: 10px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .8px;
+  }
+  .parts-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 60px 1fr 1fr;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .parts-row input {
+    border: none; border-radius: 0;
+    border-right: 1px solid var(--border);
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  .parts-row input:last-child { border-right: none; }
+  .parts-row input:focus { background: #fff8f8; border-color: transparent; }
+
+  .parts-total {
+    display: flex; justify-content: flex-end; align-items: center;
+    gap: 12px; padding: 12px 16px;
+    background: #f9fafb;
+    border-top: 1px solid var(--border);
+  }
+  .parts-total label { font-size: 13px; font-weight: 700; color: var(--text); text-transform: uppercase; }
+  .parts-total input { width: 130px; font-weight: 700; }
+
+  /* VALORES */
+  .valores-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) auto;
+    gap: 0;
+  }
+  .valor-item { padding: 14px 16px; border-right: 1px solid var(--border); }
+  .valor-item:last-child { background: var(--dark); border-radius: 0; }
+  .valor-item:last-child label { color: #aab; }
+  .valor-item:last-child input { background: var(--dark); color: white; border-color: var(--mid); font-size: 17px; }
+
+  /* SIGNATURE */
+  .sig-container { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .sig-box { padding: 16px; }
+  .sig-box:first-child { border-right: 1px solid var(--border); }
+  .sig-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .sig-canvas-wrap {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f9fafb;
+    position: relative;
+  }
+  canvas.sig-pad {
+    display: block; width: 100%; height: 120px; touch-action: none;
+    cursor: crosshair;
+  }
+  .sig-clear {
+    position: absolute; top: 6px; right: 6px;
+    background: rgba(200,16,46,0.1); color: var(--red);
+    border: 1px solid rgba(200,16,46,0.3);
+    border-radius: 4px; padding: 3px 8px;
+    font-size: 11px; font-weight: 700; cursor: pointer;
+  }
+  .sig-fields { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+
+  /* ADD ROW BTN */
+  .add-row-btn {
+    width: 100%;
+    padding: 10px;
+    background: none;
+    border: none;
+    color: var(--red);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 700; font-size: 13px;
+    cursor: pointer;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    border-top: 1px solid var(--border);
+  }
+  .add-row-btn:hover { background: #fff5f6; }
+
+  /* FOOTER */
+  .footer-card {
+    background: var(--dark);
+    color: white;
+    padding: 16px 20px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+  }
+  .footer-slogan { font-size: 13px; color: #aab; line-height: 1.5; }
+  .footer-contact { display: flex; flex-direction: column; gap: 4px; text-align: right; }
+  .footer-contact span { font-size: 13px; color: #ccd; }
+  .footer-contact strong { color: white; }
+
+  /* OUTROS field input smaller */
+  .outros-input {
+    flex: 1; min-width: 100px;
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 13px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--dark); color: white;
+    padding: 12px 24px; border-radius: 8px;
+    font-weight: 600; font-size: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 999; opacity: 0; pointer-events: none;
+    transition: opacity .3s;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  @media print {
+    .actions-bar, .add-row-btn, .sig-clear, .btn { display: none !important; }
+    body { background: white; }
+    .card { box-shadow: none; border: 1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">
+    <div class="logo-box">A</div>
+    <div class="logo-text">
+      <strong>ANTUNES</strong>
+      <span>Lift Solutions</span>
+    </div>
+  </div>
+  <div class="header-title">Ordem de Serviço</div>
+</div>
+
+<!-- ACTIONS -->
+<div class="actions-bar">
+  <button class="btn btn-ghost" onclick="limparForm()">Limpar</button>
+  <button class="btn btn-ghost" onclick="window.print()">Imprimir</button>
+  <button class="btn btn-primary" onclick="compartilhar()">📤 Enviar</button>
+</div>
+
+<div class="form-container">
+
+  <!-- IDENTIFICAÇÃO -->
+  <div class="card">
+    <div class="section-header"><div class="dot"></div> Identificação da OS</div>
+    <div class="fields">
+      <div class="row">
+        <div class="field w33">
+          <label>Nº OS</label>
+          <input type="text" class="os-number-input" id="numOS" placeholder="OS-0001">
+        </div>
+        <div class="field w33">
+          <label>Data</label>
+          <input type="date" id="dataOS">
+        </div>
+        <div class="field w33">
+          <label>Hora</label>
+          <input type="time" id="horaOS">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENTE -->
+  <div class="card">
+    <div class="section-header"><div class="dot"></div> Dados do Cliente</div>
+    <div class="fields">
+      <div class="row">
+        <div class="field w66">
+          <label>Cliente</label>
+          <input type="text" id="cliente" placeholder="Nome ou razão social">
+        </div>
+        <div class="field w33">
+          <label>CNPJ / CPF</label>
+          <input type="text" id="cnpj" placeholder="00.000.000/0001-00">
+        </div>
+      </div>
+      <div class="row">
+        <div class="field w66">
+          <label>Endereço</label>
+          <input type="text" id="endereco" placeholder="Rua, número, bairro">
+        </div>
+        <div class="field">
+          <label>Cidade</label>
+          <input type="text" id="cidade" placeholder="Cidade">
+        </div>
+        <div class="field" style="max-width:80px">
+          <label>Estado</label>
+          <input type="text" id="estado" placeholder="SC" maxlength="2">
+        </div>
+      </div>
+      <div class="row">
+        <div class="field w66">
+          <label>Contato</label>
+          <input type="text" id="contato" placeholder="Nome do responsável">
+        </div>
+        <div class="field w33">
+          <label>Telefone</label>
+          <input type="text" id="telefone" placeholder="(47) 99999-9999">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATENDIMENTO -->
+  <div class="card">
+    <div class="two-col-header">
+      <div class="section-header"><div class="dot"></div> Início do Atendimento</div>
+      <div class="section-header"><div class="dot"></div> Término do Atendimento</div>
+    </div>
+    <div class="two-col">
+      <div class="two-col-item">
+        <div class="fields" style="padding:0; gap:10px">
+          <div class="row">
+            <div class="field"><label>Data</label><input type="date" id="inicioData"></div>
+            <div class="field"><label>Hora</label><input type="time" id="inicioHora"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>Almoço</label><input type="time" id="almoco"></div>
+            <div class="field"><label>Saída</label><input type="time" id="saida"></div>
+          </div>
+        </div>
+      </div>
+      <div class="two-col-item">
+        <div class="fields" style="padding:0; gap:10px">
+          <div class="row">
+            <div class="field"><label>Data</label><input type="date" id="fimData"></div>
+            <div class="field"><label>Hora</label><input type="time" id="fimHora"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>Retorno</label><input type="time" id="retorno"></div>
+            <div class="field"><label>Deslocamento total</label><input type="text" id="desloc" placeholder="ex: 2h30"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIPO ATENDIMENTO + EQUIPAMENTO -->
+  <div class="card">
+    <div class="two-col-header">
+      <div class="section-header"><div class="dot"></div> Tipo de Atendimento</div>
+      <div class="section-header"><div class="dot"></div> Tipo de Equipamento</div>
+    </div>
+    <div class="two-col">
+      <div class="two-col-item">
+        <div id="tipoAtendimento" style="display:flex; flex-direction:column; gap:8px">
+          <label class="check-item" onclick="toggleCheck(this)">
+            <span class="check-box"></span><span class="check-label">Corretivo</span>
+          </label>
+          <label class="check-item" onclick="toggleCheck(this)">
+            <span class="check-box"></span><span class="check-label">Preventivo</span>
+          </label>
+          <label class="check-item" onclick="toggleCheck(this)">
+            <span class="check-box"></span><span class="check-label">Projeto</span>
+          </label>
+          <label class="check-item" onclick="toggleCheck(this)">
+            <span class="check-box"></span><span class="check-label">Extra-contratual</span>
+          </label>
+          <label class="check-item" onclick="toggleCheck(this)">
+            <span class="check-box"></span><span class="check-label">Sem custo</span>
+          </label>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:4px">
+            <span style="font-size:13px; color:var(--muted)">Outros:</span>
+            <input type="text" class="outros-input" placeholder="especificar...">
+          </div>
+        </div>
+      </div>
+      <div class="two-col-item">
+        <div style="display:flex; flex-direction:column; gap:8px">
+          <label class="check-item" onclick="toggleCheck(this)">
+            <span class="check-box"></span><span class="check-label">Empilhadeira (Combustão)</span>
+          </label>
+          <label class="check-item" onclick="toggleCheck(this)">
+            <span class="check-box"></span><span class="check-label">Empilhadeira (Elétrica)</span>
+          </label>
+          <label class="check-item" onclick="toggleCheck(this)">
+            <span class="check-box"></span><span class="check-label">Transpaleteira</span>
+          </label>
+          <label class="check-item" onclick="toggleCheck(this)">
+            <span class="check-box"></span><span class="check-label">Paleteira</span>
+          </label>
+          <label class="check-item" onclick="toggleCheck(this)">
+            <span class="check-box"></span><span class="check-label">Reach</span>
+          </label>
+          <label class="check-item" onclick="toggleCheck(this)">
+            <span class="check-box"></span><span class="check-label">Retrátil</span>
+          </label>
+          <label class="check-item" onclick="toggleCheck(this)">
+            <span class="check-box"></span><span class="check-label">Plataforma Elevatória</span>
+          </label>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:4px">
+            <span style="font-size:13px; color:var(--muted)">Outros:</span>
+            <input type="text" class="outros-input" placeholder="especificar...">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EQUIPAMENTO -->
+  <div class="card">
+    <div class="section-header"><div class="dot"></div> Dados do Equipamento</div>
+    <div class="fields">
+      <div class="row">
+        <div class="field">
+          <label>Marca</label>
+          <input type="text" id="marca" placeholder="Ex: Toyota">
+        </div>
+        <div class="field">
+          <label>Modelo</label>
+          <input type="text" id="modelo" placeholder="Ex: 8FBE18">
+        </div>
+        <div class="field">
+          <label>Nº de Série / Patrimônio</label>
+          <input type="text" id="serie" placeholder="Nº série">
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Nº Frota</label>
+          <input type="text" id="frota" placeholder="Nº frota">
+        </div>
+        <div class="field">
+          <label>Horímetro</label>
+          <input type="text" id="horimetro" placeholder="Ex: 2350h">
+        </div>
+        <div class="field">
+          <label>Combustível / Bateria</label>
+          <div style="display:flex; gap:8px; margin-top:4px; flex-wrap:wrap">
+            <label class="check-item" onclick="toggleCheck(this)" style="padding:6px 10px; font-size:13px">
+              <span class="check-box"></span><span class="check-label">GLP</span>
+            </label>
+            <label class="check-item" onclick="toggleCheck(this)" style="padding:6px 10px; font-size:13px">
+              <span class="check-box"></span><span class="check-label">Diesel</span>
+            </label>
+            <label class="check-item" onclick="toggleCheck(this)" style="padding:6px 10px; font-size:13px">
+              <span class="check-box"></span><span class="check-label">Elétrica</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEFEITO CLIENTE -->
+  <div class="card">
+    <div class="section-header"><div class="dot"></div> Defeito Informado pelo Cliente</div>
+    <div class="fields">
+      <textarea id="defeitoCliente" placeholder="Descreva o defeito relatado pelo cliente..." rows="4"></textarea>
+    </div>
+  </div>
+
+  <!-- DIAGNOSTICO -->
+  <div class="card">
+    <div class="section-header"><div class="dot"></div> Defeito Constatado / Diagnóstico</div>
+    <div class="fields">
+      <textarea id="diagnostico" placeholder="Descreva o defeito constatado e o diagnóstico técnico..." rows="4"></textarea>
+    </div>
+  </div>
+
+  <!-- SERVIÇOS -->
+  <div class="card">
+    <div class="section-header"><div class="dot"></div> Serviços Realizados</div>
+    <div class="fields">
+      <textarea id="servicos" placeholder="Descreva detalhadamente os serviços realizados..." rows="5"></textarea>
+    </div>
+  </div>
+
+  <!-- PEÇAS -->
+  <div class="card">
+    <div class="section-header"><div class="dot"></div> Peças Utilizadas</div>
+    <div class="parts-header">
+      <span>Descrição da Peça</span>
+      <span>Cód. / Referência</span>
+      <span>Qtd.</span>
+      <span>Valor Unit. (R$)</span>
+      <span>Valor Total (R$)</span>
+    </div>
+    <div id="partsBody">
+      <div class="parts-row">
+        <input type="text" placeholder="Nome da peça">
+        <input type="text" placeholder="Código">
+        <input type="number" placeholder="1" min="0">
+        <input type="number" placeholder="0,00" step="0.01" oninput="calcTotalPeca(this)">
+        <input type="number" placeholder="0,00" step="0.01" readonly style="background:#f9fafb">
+      </div>
+      <div class="parts-row">
+        <input type="text" placeholder="Nome da peça">
+        <input type="text" placeholder="Código">
+        <input type="number" placeholder="1" min="0">
+        <input type="number" placeholder="0,00" step="0.01" oninput="calcTotalPeca(this)">
+        <input type="number" placeholder="0,00" step="0.01" readonly style="background:#f9fafb">
+      </div>
+      <div class="parts-row">
+        <input type="text" placeholder="Nome da peça">
+        <input type="text" placeholder="Código">
+        <input type="number" placeholder="1" min="0">
+        <input type="number" placeholder="0,00" step="0.01" oninput="calcTotalPeca(this)">
+        <input type="number" placeholder="0,00" step="0.01" readonly style="background:#f9fafb">
+      </div>
+    </div>
+    <button class="add-row-btn" onclick="addPartRow()">+ Adicionar Peça</button>
+    <div class="parts-total">
+      <label>Total Peças:</label>
+      <div class="field" style="max-width:160px">
+        <input type="text" id="totalPecas" placeholder="R$ 0,00" readonly style="font-weight:700; background:#f9fafb">
+      </div>
+    </div>
+  </div>
+
+  <!-- VALORES -->
+  <div class="card">
+    <div class="section-header"><div class="dot"></div> Valores</div>
+    <div class="valores-grid" style="flex-wrap:wrap">
+      <div class="valor-item">
+        <label>Mão de Obra (R$)</label>
+        <input type="number" id="vMO" placeholder="0,00" step="0.01" oninput="calcTotal()">
+      </div>
+      <div class="valor-item">
+        <label>Deslocamento (R$)</label>
+        <input type="number" id="vDesloc" placeholder="0,00" step="0.01" oninput="calcTotal()">
+      </div>
+      <div class="valor-item">
+        <label>Peças (R$)</label>
+        <input type="number" id="vPecas" placeholder="0,00" step="0.01" oninput="calcTotal()">
+      </div>
+      <div class="valor-item">
+        <label>Outros (R$)</label>
+        <input type="number" id="vOutros" placeholder="0,00" step="0.01" oninput="calcTotal()">
+      </div>
+      <div class="valor-item" style="min-width:160px">
+        <label style="color:#aab">Total (R$)</label>
+        <input type="text" id="vTotal" placeholder="R$ 0,00" readonly>
+      </div>
+    </div>
+  </div>
+
+  <!-- OBS -->
+  <div class="card">
+    <div class="section-header"><div class="dot"></div> Observações / Recomendações</div>
+    <div class="fields">
+      <textarea id="obs" placeholder="Observações adicionais ou recomendações para o cliente..." rows="4"></textarea>
+    </div>
+  </div>
+
+  <!-- ASSINATURAS -->
+  <div class="card">
+    <div class="section-header"><div class="dot"></div> Assinaturas</div>
+    <div class="sig-container">
+      <div class="sig-box">
+        <div class="sig-title">Assinatura do Cliente</div>
+        <div class="sig-canvas-wrap">
+          <canvas class="sig-pad" id="sigCliente"></canvas>
+          <button class="sig-clear" onclick="clearSig('sigCliente')">Limpar</button>
+        </div>
+        <div class="sig-fields">
+          <div class="field"><label>Nome</label><input type="text" id="nomeCliente" placeholder="Nome completo"></div>
+          <div class="field"><label>RG / CPF</label><input type="text" id="rgCliente" placeholder="000.000.000-00"></div>
+        </div>
+      </div>
+      <div class="sig-box">
+        <div class="sig-title">Assinatura do Técnico</div>
+        <div class="sig-canvas-wrap">
+          <canvas class="sig-pad" id="sigTecnico"></canvas>
+          <button class="sig-clear" onclick="clearSig('sigTecnico')">Limpar</button>
+        </div>
+        <div class="sig-fields">
+          <div class="field"><label>Nome</label><input type="text" id="nomeTecnico" placeholder="Nome do técnico"></div>
+          <div class="field"><label>CPF</label><input type="text" id="cpfTecnico" placeholder="000.000.000-00"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-card">
+    <div class="footer-slogan">
+      Obrigado pela confiança!<br>
+      Estamos aqui para elevar soluções e mover resultados junto com você.
+    </div>
+    <div class="footer-contact">
+      <span>📱 <strong>47 99248-2740</strong></span>
+      <span>📸 <strong>AntunesLiftSolutions</strong></span>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // Set today's date
+  document.getElementById('dataOS').valueAsDate = new Date();
+
+  // Checkbox toggle
+  function toggleCheck(el) {
+    el.classList.toggle('checked');
+  }
+
+  // Add part row
+  function addPartRow() {
+    const row = document.createElement('div');
+    row.className = 'parts-row';
+    row.innerHTML = `
+      <input type="text" placeholder="Nome da peça">
+      <input type="text" placeholder="Código">
+      <input type="number" placeholder="1" min="0">
+      <input type="number" placeholder="0,00" step="0.01" oninput="calcTotalPeca(this)">
+      <input type="number" placeholder="0,00" step="0.01" readonly style="background:#f9fafb">
+    `;
+    document.getElementById('partsBody').appendChild(row);
+  }
+
+  // Calc row total
+  function calcTotalPeca(input) {
+    const row = input.closest('.parts-row');
+    const inputs = row.querySelectorAll('input[type="number"]');
+    const qty = parseFloat(inputs[0].value) || 0;
+    const unit = parseFloat(inputs[1].value) || 0;
+    inputs[2].value = (qty * unit).toFixed(2);
+    calcTotalPecasGeral();
+  }
+
+  function calcTotalPecasGeral() {
+    const totais = document.querySelectorAll('#partsBody .parts-row input[type="number"]:last-child');
+    let sum = 0;
+    totais.forEach(i => sum += parseFloat(i.value) || 0);
+    document.getElementById('totalPecas').value = 'R$ ' + sum.toFixed(2).replace('.', ',');
+    document.getElementById('vPecas').value = sum.toFixed(2);
+    calcTotal();
+  }
+
+  function calcTotal() {
+    const mo = parseFloat(document.getElementById('vMO').value) || 0;
+    const d = parseFloat(document.getElementById('vDesloc').value) || 0;
+    const p = parseFloat(document.getElementById('vPecas').value) || 0;
+    const o = parseFloat(document.getElementById('vOutros').value) || 0;
+    document.getElementById('vTotal').value = 'R$ ' + (mo + d + p + o).toFixed(2).replace('.', ',');
+  }
+
+  // Signature pads
+  function initSigPad(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+    canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    let drawing = false, lastX = 0, lastY = 0;
+
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const src = e.touches ? e.touches[0] : e;
+      return [(src.clientX - rect.left), (src.clientY - rect.top)];
+    }
+
+    canvas.addEventListener('mousedown', e => { drawing = true; [lastX, lastY] = getPos(e); });
+    canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; [lastX, lastY] = getPos(e); }, { passive: false });
+
+    canvas.addEventListener('mousemove', e => {
+      if (!drawing) return;
+      const [x, y] = getPos(e);
+      ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+      [lastX, lastY] = [x, y];
+    });
+    canvas.addEventListener('touchmove', e => {
+      e.preventDefault();
+      if (!drawing) return;
+      const [x, y] = getPos(e);
+      ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+      [lastX, lastY] = [x, y];
+    }, { passive: false });
+
+    canvas.addEventListener('mouseup', () => drawing = false);
+    canvas.addEventListener('touchend', () => drawing = false);
+    canvas.addEventListener('mouseleave', () => drawing = false);
+  }
+
+  function clearSig(id) {
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  window.addEventListener('load', () => {
+    initSigPad('sigCliente');
+    initSigPad('sigTecnico');
+  });
+
+  // Compartilhar
+  function compartilhar() {
+    const numOS = document.getElementById('numOS').value || 'OS';
+    const cliente = document.getElementById('cliente').value || 'cliente';
+
+    if (navigator.share) {
+      // Build text summary
+      const data = document.getElementById('dataOS').value;
+      const text = `Ordem de Serviço ${numOS} – Antunes Lift Solutions\nCliente: ${cliente}\nData: ${data}\n\nPor favor, acesse o link para visualizar e assinar a OS.`;
+      navigator.share({ title: `OS ${numOS} – Antunes`, text });
+    } else {
+      // fallback: print
+      showToast('Use o botão Imprimir para exportar em PDF e enviar!');
+    }
+  }
+
+  function limparForm() {
+    if (!confirm('Deseja realmente limpar todos os campos?')) return;
+    document.querySelectorAll('input[type="text"], input[type="date"], input[type="time"], input[type="number"], textarea').forEach(i => i.value = '');
+    document.querySelectorAll('.check-item.checked').forEach(i => i.classList.remove('checked'));
+    clearSig('sigCliente');
+    clearSig('sigTecnico');
+    document.getElementById('dataOS').valueAsDate = new Date();
+    showToast('Formulário limpo!');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>
