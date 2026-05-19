@@ -870,16 +870,33 @@
     carregarDaURL();
   });
 
-  // Compartilhar com link único que contém todos os dados
-  function compartilhar() {
+  // Compartilhar com link encurtado via TinyURL
+  async function compartilhar() {
     const numOS = document.getElementById('numOS').value || 'OS';
     const cliente = document.getElementById('cliente').value || 'cliente';
     const data = document.getElementById('dataOS').value
       ? new Date(document.getElementById('dataOS').value + 'T12:00:00').toLocaleDateString('pt-BR') : '';
-    const link = gerarLink();
-    const texto = 'Olá, ' + cliente + '! 👋\n\nSegue sua *Ordem de Serviço ' + numOS + '* – Antunes Lift Solutions.\n📅 Data: ' + data + '\n\nAcesse o link abaixo para visualizar e assinar digitalmente:\n🔗 ' + link + '\n\nQualquer dúvida, estamos à disposição!\n📞 47 99248-2740';
+    const linkLongo = gerarLink();
+
+    showToast('Gerando link, aguarde...');
+
+    let linkFinal = linkLongo;
+    try {
+      const res = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(linkLongo));
+      if (res.ok) linkFinal = await res.text();
+    } catch(e) { /* usa link longo se falhar */ }
+
+    const texto =
+      'Olá, *' + cliente + '*! 👋\n\n' +
+      '📋 *Ordem de Serviço ' + numOS + '*\n' +
+      '🏢 Antunes Lift Solutions\n' +
+      '📅 ' + data + '\n\n' +
+      '👇 Acesse para visualizar e assinar:\n' +
+      linkFinal + '\n\n' +
+      '📞 47 99248-2740';
+
     if (navigator.share) {
-      navigator.share({ title: 'OS ' + numOS + ' – Antunes Lift Solutions', text: texto, url: link });
+      navigator.share({ title: 'OS ' + numOS + ' – Antunes', text: texto, url: linkFinal });
     } else {
       window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
     }
