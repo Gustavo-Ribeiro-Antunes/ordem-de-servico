@@ -490,7 +490,25 @@
       pecas.push([...row.querySelectorAll('input')].map(i => i.value));
     });
     dados._pecas = pecas;
+
+    // Salva assinaturas como imagem base64
+    dados._sigCliente = document.getElementById('sigCliente').toDataURL();
+    dados._sigTecnico = document.getElementById('sigTecnico').toDataURL();
+
     return dados;
+  }
+
+  function restaurarAssinatura(canvasId, dataURL) {
+    if (!dataURL || dataURL === 'data:,') return;
+    const canvas = document.getElementById(canvasId);
+    const img = new Image();
+    img.onload = () => {
+      // Desenha na resolução correta (canvas já foi escalado pelo devicePixelRatio)
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width / window.devicePixelRatio, canvas.height / window.devicePixelRatio);
+    };
+    img.src = dataURL;
   }
 
   function preencherForm(dados) {
@@ -512,6 +530,9 @@
         dados._pecas[ri].forEach((v, ci) => { if (inputs[ci]) inputs[ci].value = v; });
       });
     }
+    // Restaura assinaturas
+    if (dados._sigCliente) restaurarAssinatura('sigCliente', dados._sigCliente);
+    if (dados._sigTecnico) restaurarAssinatura('sigTecnico', dados._sigTecnico);
   }
 
   // ===== CARREGAR DA URL =====
