@@ -916,8 +916,8 @@
         window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
       }, 800);
     } catch(e) {
-      console.error(e);
-      showToast('Erro ao salvar. Verifique sua conexão.');
+      console.error('Erro Firebase:', e);
+      showToast('Erro: ' + (e.message || e.code || JSON.stringify(e)));
     }
   }
 
