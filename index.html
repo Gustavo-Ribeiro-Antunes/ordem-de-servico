@@ -870,8 +870,7 @@
     carregarDaURL();
   });
 
-  // Compartilhar — link longo vai no campo url (separado do texto)
-  // O WhatsApp exibe o link como preview bonito, sem mostrar a URL no corpo da mensagem
+  // Compartilhar via WhatsApp — link na última linha sozinho vira preview
   function compartilhar() {
     const numOS = document.getElementById('numOS').value || 'OS';
     const cliente = document.getElementById('cliente').value || 'cliente';
@@ -879,26 +878,17 @@
       ? new Date(document.getElementById('dataOS').value + 'T12:00:00').toLocaleDateString('pt-BR') : '';
     const link = gerarLink();
 
-    // Texto limpo, sem URL — o link vai separado no campo url do share
+    // Link fica na última linha, sozinho — WhatsApp gera preview automático
+    // e NÃO exibe a URL longa no corpo da mensagem
     const texto =
       'Olá, *' + cliente + '*! 👋\n\n' +
       '📋 *OS ' + numOS + '* – Antunes Lift Solutions\n' +
       '📅 ' + data + '\n\n' +
-      '👇 Toque no link abaixo para visualizar e assinar a OS.\n\n' +
-      '📞 47 99248-2740 | AntunesLiftSolutions';
+      '👇 Toque para visualizar e assinar:\n\n' +
+      link;
 
-    if (navigator.share) {
-      // No celular: texto limpo + link separado. O WhatsApp une os dois automaticamente
-      navigator.share({
-        title: 'OS ' + numOS + ' – Antunes Lift Solutions',
-        text: texto,
-        url: link
-      });
-    } else {
-      // Fallback desktop: abre WhatsApp Web com texto + link juntos
-      const textoComLink = texto + '\n' + link;
-      window.open('https://wa.me/?text=' + encodeURIComponent(textoComLink), '_blank');
-    }
+    // Sempre usa wa.me para evitar que navigator.share cole o link duplicado
+    window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
   }
 
   function limparForm() {
