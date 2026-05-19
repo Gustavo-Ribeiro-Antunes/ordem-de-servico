@@ -796,27 +796,92 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
+  // IDs de todos os campos
+  const FIELD_IDS = [
+    'numOS','dataOS','horaOS','cliente','cnpj','endereco','cidade','estado','contato','telefone',
+    'inicioData','inicioHora','almoco','saida','fimData','fimHora','retorno','desloc',
+    'marca','modelo','serie','frota','horimetro',
+    'defeitoCliente','diagnostico','servicos','obs',
+    'totalPecas','vMO','vDesloc','vPecas','vOutros','vTotal',
+    'nomeCliente','rgCliente','nomeTecnico','cpfTecnico'
+  ];
+
+  // Gera link único com todos os dados embutidos
+  function gerarLink() {
+    const dados = {};
+    FIELD_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) dados[id] = el.value;
+    });
+    const checks = [];
+    document.querySelectorAll('.check-item').forEach((el, i) => {
+      if (el.classList.contains('checked')) checks.push(i);
+    });
+    dados._checks = checks;
+    const outros = [];
+    document.querySelectorAll('.outros-input').forEach(el => outros.push(el.value));
+    dados._outros = outros;
+    const pecas = [];
+    document.querySelectorAll('#partsBody .parts-row').forEach(row => {
+      pecas.push([...row.querySelectorAll('input')].map(i => i.value));
+    });
+    dados._pecas = pecas;
+    const json = JSON.stringify(dados);
+    const base64 = btoa(unescape(encodeURIComponent(json)));
+    return 'https://gustavo-ribeiro-antunes.github.io/ordem-de-servico?os=' + base64;
+  }
+
+  // Carrega dados da URL ao abrir
+  function carregarDaURL() {
+    const params = new URLSearchParams(window.location.search);
+    const base64 = params.get('os');
+    if (!base64) return;
+    try {
+      const json = decodeURIComponent(escape(atob(base64)));
+      const dados = JSON.parse(json);
+      FIELD_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && dados[id] !== undefined) el.value = dados[id];
+      });
+      if (dados._checks) {
+        const items = document.querySelectorAll('.check-item');
+        dados._checks.forEach(i => { if (items[i]) items[i].classList.add('checked'); });
+      }
+      if (dados._outros) {
+        const outros = document.querySelectorAll('.outros-input');
+        dados._outros.forEach((v, i) => { if (outros[i]) outros[i].value = v; });
+      }
+      if (dados._pecas && dados._pecas.length) {
+        const tbody = document.getElementById('partsBody');
+        while (tbody.querySelectorAll('.parts-row').length < dados._pecas.length) addPartRow();
+        tbody.querySelectorAll('.parts-row').forEach((row, ri) => {
+          if (!dados._pecas[ri]) return;
+          const inputs = row.querySelectorAll('input');
+          dados._pecas[ri].forEach((v, ci) => { if (inputs[ci]) inputs[ci].value = v; });
+        });
+      }
+      showToast('OS carregada com sucesso!');
+    } catch(e) { console.error('Erro ao carregar OS da URL', e); }
+  }
+
   window.addEventListener('load', () => {
     initSigPad('sigCliente');
     initSigPad('sigTecnico');
+    carregarDaURL();
   });
 
-  // Compartilhar
+  // Compartilhar com link único que contém todos os dados
   function compartilhar() {
     const numOS = document.getElementById('numOS').value || 'OS';
     const cliente = document.getElementById('cliente').value || 'cliente';
     const data = document.getElementById('dataOS').value
       ? new Date(document.getElementById('dataOS').value + 'T12:00:00').toLocaleDateString('pt-BR') : '';
-    const link = 'https://gustavo-ribeiro-antunes.github.io/ordem-de-servico';
-
-    const texto = `Olá, ${cliente}! 👋\n\nSegue sua *Ordem de Serviço ${numOS}* – Antunes Lift Solutions.\n📅 Data: ${data}\n\nAcesse o link abaixo para visualizar e assinar digitalmente:\n🔗 ${link}\n\nQualquer dúvida, estamos à disposição!\n📞 47 99248-2740`;
-
+    const link = gerarLink();
+    const texto = 'Olá, ' + cliente + '! 👋\n\nSegue sua *Ordem de Serviço ' + numOS + '* – Antunes Lift Solutions.\n📅 Data: ' + data + '\n\nAcesse o link abaixo para visualizar e assinar digitalmente:\n🔗 ' + link + '\n\nQualquer dúvida, estamos à disposição!\n📞 47 99248-2740';
     if (navigator.share) {
-      navigator.share({ title: `OS ${numOS} – Antunes Lift Solutions`, text: texto, url: link });
+      navigator.share({ title: 'OS ' + numOS + ' – Antunes Lift Solutions', text: texto, url: link });
     } else {
-      // fallback: abre WhatsApp Web com a mensagem
-      const encoded = encodeURIComponent(texto);
-      window.open(`https://wa.me/?text=${encoded}`, '_blank');
+      window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
     }
   }
 
