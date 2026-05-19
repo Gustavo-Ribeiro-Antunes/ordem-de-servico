@@ -870,59 +870,34 @@
     carregarDaURL();
   });
 
-  // Encurta link usando is.gd (suporta CORS)
-  async function encurtarLink(url) {
-    try {
-      const res = await fetch('https://is.gd/create.php?format=simple&url=' + encodeURIComponent(url));
-      if (res.ok) {
-        const short = (await res.text()).trim();
-        if (short.startsWith('https://is.gd/')) return short;
-      }
-    } catch(e) {}
-    // fallback: cleanuri
-    try {
-      const res = await fetch('https://cleanuri.com/api/v1/shorten', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'url=' + encodeURIComponent(url)
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.result_url) return json.result_url;
-      }
-    } catch(e) {}
-    return null;
-  }
-
-  // Compartilhar com link encurtado
-  async function compartilhar() {
+  // Compartilhar — link longo vai no campo url (separado do texto)
+  // O WhatsApp exibe o link como preview bonito, sem mostrar a URL no corpo da mensagem
+  function compartilhar() {
     const numOS = document.getElementById('numOS').value || 'OS';
     const cliente = document.getElementById('cliente').value || 'cliente';
     const data = document.getElementById('dataOS').value
       ? new Date(document.getElementById('dataOS').value + 'T12:00:00').toLocaleDateString('pt-BR') : '';
-    const linkLongo = gerarLink();
+    const link = gerarLink();
 
-    showToast('Gerando link, aguarde...');
-
-    const linkCurto = await encurtarLink(linkLongo);
-
-    if (!linkCurto) {
-      showToast('Não foi possível encurtar o link. Tente novamente.');
-      return;
-    }
-
+    // Texto limpo, sem URL — o link vai separado no campo url do share
     const texto =
       'Olá, *' + cliente + '*! 👋\n\n' +
       '📋 *OS ' + numOS + '* – Antunes Lift Solutions\n' +
       '📅 ' + data + '\n\n' +
-      '👇 Toque para visualizar e assinar:\n' +
-      linkCurto + '\n\n' +
-      '📞 47 99248-2740';
+      '👇 Toque no link abaixo para visualizar e assinar a OS.\n\n' +
+      '📞 47 99248-2740 | AntunesLiftSolutions';
 
     if (navigator.share) {
-      navigator.share({ title: 'OS ' + numOS + ' – Antunes', text: texto, url: linkCurto });
+      // No celular: texto limpo + link separado. O WhatsApp une os dois automaticamente
+      navigator.share({
+        title: 'OS ' + numOS + ' – Antunes Lift Solutions',
+        text: texto,
+        url: link
+      });
     } else {
-      window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
+      // Fallback desktop: abre WhatsApp Web com texto + link juntos
+      const textoComLink = texto + '\n' + link;
+      window.open('https://wa.me/?text=' + encodeURIComponent(textoComLink), '_blank');
     }
   }
 
