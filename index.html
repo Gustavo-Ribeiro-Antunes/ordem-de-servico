@@ -699,16 +699,29 @@
 
 <div class="toast" id="toast"></div>
 
-<script type="module">
-  // Set today's date
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+  // ===== FIREBASE =====
+  firebase.initializeApp({
+    apiKey: "AIzaSyCYNXzPZdTGCREW1ipOixaKeuWUv9MlH6w",
+    authDomain: "antunes-os.firebaseapp.com",
+    projectId: "antunes-os",
+    storageBucket: "antunes-os.firebasestorage.app",
+    messagingSenderId: "1093545618743",
+    appId: "1:1093545618743:web:107729575d9768c8e63eb2"
+  });
+  const db = firebase.firestore();
+
+  // ===== INIT =====
   document.getElementById('dataOS').valueAsDate = new Date();
 
-  // Checkbox toggle
+  // ===== CHECKBOX =====
   function toggleCheck(el) {
     el.classList.toggle('checked');
   }
 
-  // Add part row
+  // ===== PEÇAS =====
   function addPartRow() {
     const row = document.createElement('div');
     row.className = 'parts-row';
@@ -722,7 +735,6 @@
     document.getElementById('partsBody').appendChild(row);
   }
 
-  // Calc row total
   function calcTotalPeca(input) {
     const row = input.closest('.parts-row');
     const inputs = row.querySelectorAll('input[type="number"]');
@@ -749,7 +761,7 @@
     document.getElementById('vTotal').value = 'R$ ' + (mo + d + p + o).toFixed(2).replace('.', ',');
   }
 
-  // Signature pads
+  // ===== ASSINATURAS =====
   function initSigPad(canvasId) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext('2d');
@@ -770,7 +782,6 @@
 
     canvas.addEventListener('mousedown', e => { drawing = true; [lastX, lastY] = getPos(e); });
     canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; [lastX, lastY] = getPos(e); }, { passive: false });
-
     canvas.addEventListener('mousemove', e => {
       if (!drawing) return;
       const [x, y] = getPos(e);
@@ -784,7 +795,6 @@
       ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
       [lastX, lastY] = [x, y];
     }, { passive: false });
-
     canvas.addEventListener('mouseup', () => drawing = false);
     canvas.addEventListener('touchend', () => drawing = false);
     canvas.addEventListener('mouseleave', () => drawing = false);
@@ -792,11 +802,10 @@
 
   function clearSig(id) {
     const canvas = document.getElementById(id);
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
   }
 
-  // IDs de todos os campos
+  // ===== COLETA DADOS =====
   const FIELD_IDS = [
     'numOS','dataOS','horaOS','cliente','cnpj','endereco','cidade','estado','contato','telefone',
     'inicioData','inicioHora','almoco','saida','fimData','fimHora','retorno','desloc',
@@ -806,22 +815,6 @@
     'nomeCliente','rgCliente','nomeTecnico','cpfTecnico'
   ];
 
-  // ========== FIREBASE ==========
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCYNXzPZdTGCREW1ipOixaKeuWUv9MlH6w",
-    authDomain: "antunes-os.firebaseapp.com",
-    projectId: "antunes-os",
-    storageBucket: "antunes-os.firebasestorage.app",
-    messagingSenderId: "1093545618743",
-    appId: "1:1093545618743:web:107729575d9768c8e63eb2"
-  };
-  const fbApp = initializeApp(firebaseConfig);
-  const db = getFirestore(fbApp);
-
-  // Coleta todos os dados do formulário
   function coletarDados() {
     const dados = {};
     FIELD_IDS.forEach(id => {
@@ -844,7 +837,6 @@
     return dados;
   }
 
-  // Preenche o formulário com dados salvos
   function preencherForm(dados) {
     FIELD_IDS.forEach(id => {
       const el = document.getElementById(id);
@@ -869,15 +861,15 @@
     }
   }
 
-  // Carrega OS do Firebase se houver ?os=ID na URL
+  // ===== CARREGAR DA URL =====
   async function carregarDaURL() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('os');
     if (!id) return;
     try {
       showToast('Carregando OS...');
-      const snap = await getDoc(doc(db, 'ordens', id));
-      if (snap.exists()) {
+      const snap = await db.collection('ordens').doc(id).get();
+      if (snap.exists) {
         preencherForm(snap.data());
         showToast('OS carregada com sucesso!');
       } else {
@@ -895,9 +887,7 @@
     carregarDaURL();
   });
 
-
-
-  // Salva no Firebase e envia link curto pelo WhatsApp
+  // ===== ENVIAR =====
   async function compartilhar() {
     const numOS = document.getElementById('numOS').value.trim();
     if (!numOS) { showToast('Preencha o Nº da OS antes de enviar!'); return; }
@@ -907,15 +897,12 @@
       ? new Date(document.getElementById('dataOS').value + 'T12:00:00').toLocaleDateString('pt-BR') : '';
 
     showToast('Salvando OS, aguarde...');
-
     try {
       const dados = coletarDados();
-      // ID do documento = número da OS (ex: "OS-001")
       const docId = numOS.replace(/[^a-zA-Z0-9_-]/g, '_');
-      await setDoc(doc(db, 'ordens', docId), dados);
+      await db.collection('ordens').doc(docId).set(dados);
 
       const link = 'https://gustavo-ribeiro-antunes.github.io/ordem-de-servico?os=' + docId;
-
       const texto =
         'Olá, *' + cliente + '*! 👋\n\n' +
         '📋 *OS ' + numOS + '* – Antunes Lift Solutions\n' +
@@ -928,13 +915,13 @@
       setTimeout(() => {
         window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
       }, 800);
-
     } catch(e) {
       console.error(e);
-      showToast('Erro ao salvar OS. Verifique sua conexão.');
+      showToast('Erro ao salvar. Verifique sua conexão.');
     }
   }
 
+  // ===== LIMPAR =====
   function limparForm() {
     if (!confirm('Deseja realmente limpar todos os campos?')) return;
     document.querySelectorAll('input[type="text"], input[type="date"], input[type="time"], input[type="number"], textarea').forEach(i => i.value = '');
@@ -945,20 +932,13 @@
     showToast('Formulário limpo!');
   }
 
+  // ===== TOAST =====
   function showToast(msg) {
     const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
+    t.textContent = msg;
+    t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
   }
-
-  // Expõe funções ao escopo global (necessário com type="module")
-  window.compartilhar = compartilhar;
-  window.limparForm = limparForm;
-  window.toggleCheck = toggleCheck;
-  window.addPartRow = addPartRow;
-  window.calcTotalPeca = calcTotalPeca;
-  window.calcTotal = calcTotal;
-  window.clearSig = clearSig;
 </script>
 </body>
 </html>
