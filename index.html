@@ -895,6 +895,15 @@
     carregarDaURL();
   });
 
+  // Expõe funções ao escopo global (necessário com type="module")
+  window.compartilhar = compartilhar;
+  window.limparForm = limparForm;
+  window.toggleCheck = toggleCheck;
+  window.addPartRow = addPartRow;
+  window.calcTotalPeca = calcTotalPeca;
+  window.calcTotal = calcTotal;
+  window.clearSig = clearSig;
+
   // Salva no Firebase e envia link curto pelo WhatsApp
   async function compartilhar() {
     const numOS = document.getElementById('numOS').value.trim();
