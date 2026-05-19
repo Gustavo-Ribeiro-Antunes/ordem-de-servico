@@ -870,7 +870,31 @@
     carregarDaURL();
   });
 
-  // Compartilhar com link encurtado via TinyURL
+  // Encurta link usando is.gd (suporta CORS)
+  async function encurtarLink(url) {
+    try {
+      const res = await fetch('https://is.gd/create.php?format=simple&url=' + encodeURIComponent(url));
+      if (res.ok) {
+        const short = (await res.text()).trim();
+        if (short.startsWith('https://is.gd/')) return short;
+      }
+    } catch(e) {}
+    // fallback: cleanuri
+    try {
+      const res = await fetch('https://cleanuri.com/api/v1/shorten', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'url=' + encodeURIComponent(url)
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.result_url) return json.result_url;
+      }
+    } catch(e) {}
+    return null;
+  }
+
+  // Compartilhar com link encurtado
   async function compartilhar() {
     const numOS = document.getElementById('numOS').value || 'OS';
     const cliente = document.getElementById('cliente').value || 'cliente';
@@ -880,23 +904,23 @@
 
     showToast('Gerando link, aguarde...');
 
-    let linkFinal = linkLongo;
-    try {
-      const res = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(linkLongo));
-      if (res.ok) linkFinal = await res.text();
-    } catch(e) { /* usa link longo se falhar */ }
+    const linkCurto = await encurtarLink(linkLongo);
+
+    if (!linkCurto) {
+      showToast('Não foi possível encurtar o link. Tente novamente.');
+      return;
+    }
 
     const texto =
       'Olá, *' + cliente + '*! 👋\n\n' +
-      '📋 *Ordem de Serviço ' + numOS + '*\n' +
-      '🏢 Antunes Lift Solutions\n' +
+      '📋 *OS ' + numOS + '* – Antunes Lift Solutions\n' +
       '📅 ' + data + '\n\n' +
-      '👇 Acesse para visualizar e assinar:\n' +
-      linkFinal + '\n\n' +
+      '👇 Toque para visualizar e assinar:\n' +
+      linkCurto + '\n\n' +
       '📞 47 99248-2740';
 
     if (navigator.share) {
-      navigator.share({ title: 'OS ' + numOS + ' – Antunes', text: texto, url: linkFinal });
+      navigator.share({ title: 'OS ' + numOS + ' – Antunes', text: texto, url: linkCurto });
     } else {
       window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
     }
