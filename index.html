@@ -805,15 +805,18 @@
   function compartilhar() {
     const numOS = document.getElementById('numOS').value || 'OS';
     const cliente = document.getElementById('cliente').value || 'cliente';
+    const data = document.getElementById('dataOS').value
+      ? new Date(document.getElementById('dataOS').value + 'T12:00:00').toLocaleDateString('pt-BR') : '';
+    const link = 'https://gustavo-ribeiro-antunes.github.io/ordem-de-servico';
+
+    const texto = `Olá, ${cliente}! 👋\n\nSegue sua *Ordem de Serviço ${numOS}* – Antunes Lift Solutions.\n📅 Data: ${data}\n\nAcesse o link abaixo para visualizar e assinar digitalmente:\n🔗 ${link}\n\nQualquer dúvida, estamos à disposição!\n📞 47 99248-2740`;
 
     if (navigator.share) {
-      // Build text summary
-      const data = document.getElementById('dataOS').value;
-      const text = `Ordem de Serviço ${numOS} – Antunes Lift Solutions\nCliente: ${cliente}\nData: ${data}\n\nPor favor, acesse o link para visualizar e assinar a OS.`;
-      navigator.share({ title: `OS ${numOS} – Antunes`, text });
+      navigator.share({ title: `OS ${numOS} – Antunes Lift Solutions`, text: texto, url: link });
     } else {
-      // fallback: print
-      showToast('Use o botão Imprimir para exportar em PDF e enviar!');
+      // fallback: abre WhatsApp Web com a mensagem
+      const encoded = encodeURIComponent(texto);
+      window.open(`https://wa.me/?text=${encoded}`, '_blank');
     }
   }
 
