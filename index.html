@@ -95,7 +95,14 @@
   canvas.sig-pad { display: block; width: 100%; height: 120px; touch-action: none; cursor: crosshair; }
   .sig-clear { position: absolute; top: 6px; right: 6px; background: rgba(200,16,46,0.1); color: var(--red); border: 1px solid rgba(200,16,46,0.3); border-radius: 4px; padding: 3px 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
   .sig-fields { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-  .outros-input { flex: 1; min-width: 100px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; }
+  .sub-section-header { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--dark); background: #f0f2f8; border-left: 3px solid var(--red); padding: 8px 12px; border-radius: 4px; margin-bottom: 4px; }
+  .sub-divider { border: none; border-top: 2px dashed var(--border); margin: 4px 0; }
+
+  /* Grid de checkboxes 2 colunas */
+  .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 400px) { .check-grid { grid-template-columns: 1fr; } }
+
+  /* Remove estilos antigos de two-col que não são mais usados */
 
   .footer-card { background: var(--dark); color: white; padding: 16px 20px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
   .footer-slogan { font-size: 13px; color: #aab; line-height: 1.5; }
@@ -105,6 +112,56 @@
 
   .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--dark); color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 999; opacity: 0; pointer-events: none; transition: opacity .3s; white-space: nowrap; }
   .toast.show { opacity: 1; }
+
+  /* ===== MOBILE ===== */
+  @media (max-width: 600px) {
+    /* Header compacto */
+    .header { padding: 12px 14px; }
+    .header-title { font-size: 16px; }
+    .logo-text strong { font-size: 15px; }
+
+    /* Botões da barra de ações maiores para toque */
+    .actions-bar { padding: 8px 12px; gap: 6px; top: 60px; }
+    .btn { padding: 10px 14px; font-size: 12px; flex: 1; text-align: center; }
+
+    /* Campos full width no mobile */
+    .field.w33, .field.w66 { flex: 0 0 100%; }
+    .row { flex-direction: column; gap: 10px; }
+
+    /* Seções de duas colunas viram coluna única */
+    .two-col { grid-template-columns: 1fr; }
+    .two-col-item:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    .two-col-header { grid-template-columns: 1fr; }
+    .two-col-header .section-header:first-child { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.15); }
+
+    /* Peças: scroll horizontal para manter a tabela legível */
+    .parts-scroll-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .parts-scroll-wrap .parts-header,
+    .parts-scroll-wrap .parts-row { min-width: 520px; }
+
+    /* Valores: empilha em 2 colunas em vez de 5 */
+    .valores-grid { grid-template-columns: 1fr 1fr; }
+    .valor-item { border-right: none; border-bottom: 1px solid var(--border); }
+    .valor-item:nth-child(odd) { border-right: 1px solid var(--border); }
+    /* Total ocupa linha inteira */
+    .valor-total-full { grid-column: 1 / -1; border-right: none !important; }
+
+    /* Assinaturas empilhadas */
+    .sig-container { grid-template-columns: 1fr; }
+    .sig-box:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    canvas.sig-pad { height: 150px; }
+
+    /* Inputs maiores para toque */
+    input[type="text"], input[type="date"], input[type="time"], input[type="number"], textarea {
+      font-size: 16px; /* evita zoom automático no iOS */
+      padding: 12px 14px;
+    }
+    .os-number-input { font-size: 24px !important; }
+
+    /* Footer empilhado */
+    .footer-card { flex-direction: column; text-align: center; }
+    .footer-contact { text-align: center; }
+  }
 
   @media print {
     .actions-bar, .add-row-btn, .sig-clear, .btn { display: none !important; }
@@ -165,72 +222,63 @@
   </div>
 
   <div class="card">
-    <div class="two-col-header">
-      <div class="section-header"><div class="dot"></div> Início do Atendimento</div>
-      <div class="section-header"><div class="dot"></div> Término do Atendimento</div>
-    </div>
-    <div class="two-col">
-      <div class="two-col-item">
-        <div class="fields" style="padding:0; gap:10px">
-          <div class="row">
-            <div class="field"><label>Data</label><input type="date" id="inicioData"></div>
-            <div class="field"><label>Hora</label><input type="time" id="inicioHora"></div>
-          </div>
-          <div class="row">
-            <div class="field"><label>Almoço</label><input type="time" id="almoco"></div>
-            <div class="field"><label>Saída</label><input type="time" id="saida"></div>
-          </div>
-        </div>
+    <div class="section-header"><div class="dot"></div> Registro de Horas</div>
+    <div class="fields">
+
+      <!-- Início -->
+      <div class="sub-section-header">🟢 Início do Atendimento</div>
+      <div class="row">
+        <div class="field"><label>Data de Início</label><input type="date" id="inicioData"></div>
+        <div class="field"><label>Hora de Início</label><input type="time" id="inicioHora"></div>
       </div>
-      <div class="two-col-item">
-        <div class="fields" style="padding:0; gap:10px">
-          <div class="row">
-            <div class="field"><label>Data</label><input type="date" id="fimData"></div>
-            <div class="field"><label>Hora</label><input type="time" id="fimHora"></div>
-          </div>
-          <div class="row">
-            <div class="field"><label>Retorno</label><input type="time" id="retorno"></div>
-            <div class="field"><label>Deslocamento total</label><input type="text" id="desloc" placeholder="ex: 2h30"></div>
-          </div>
-        </div>
+      <div class="row">
+        <div class="field"><label>Saída p/ Almoço</label><input type="time" id="almoco"></div>
+        <div class="field"><label>Retorno do Almoço</label><input type="time" id="saida"></div>
       </div>
+
+      <div class="sub-divider"></div>
+
+      <!-- Término -->
+      <div class="sub-section-header">🔴 Término do Atendimento</div>
+      <div class="row">
+        <div class="field"><label>Data de Término</label><input type="date" id="fimData"></div>
+        <div class="field"><label>Hora de Término</label><input type="time" id="fimHora"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Retorno à Base</label><input type="time" id="retorno"></div>
+        <div class="field"><label>Deslocamento Total</label><input type="text" id="desloc" placeholder="ex: 2h30"></div>
+      </div>
+
     </div>
   </div>
 
   <div class="card">
-    <div class="two-col-header">
-      <div class="section-header"><div class="dot"></div> Tipo de Atendimento</div>
-      <div class="section-header"><div class="dot"></div> Tipo de Equipamento</div>
+    <div class="section-header"><div class="dot"></div> Tipo de Atendimento</div>
+    <div class="fields">
+      <div class="check-grid">
+        <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Corretivo</span></label>
+        <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Preventivo</span></label>
+        <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Projeto</span></label>
+        <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Extra-contratual</span></label>
+        <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Sem custo</span></label>
+      </div>
+      <div class="field"><label>Outros</label><input type="text" class="outros-input" style="width:100%" placeholder="especificar..."></div>
     </div>
-    <div class="two-col">
-      <div class="two-col-item">
-        <div style="display:flex; flex-direction:column; gap:8px">
-          <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Corretivo</span></label>
-          <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Preventivo</span></label>
-          <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Projeto</span></label>
-          <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Extra-contratual</span></label>
-          <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Sem custo</span></label>
-          <div style="display:flex; align-items:center; gap:8px; margin-top:4px">
-            <span style="font-size:13px; color:var(--muted)">Outros:</span>
-            <input type="text" class="outros-input" placeholder="especificar...">
-          </div>
-        </div>
+  </div>
+
+  <div class="card">
+    <div class="section-header"><div class="dot"></div> Tipo de Equipamento</div>
+    <div class="fields">
+      <div class="check-grid">
+        <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Empilhadeira (Combustão)</span></label>
+        <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Empilhadeira (Elétrica)</span></label>
+        <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Transpaleteira</span></label>
+        <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Paleteira</span></label>
+        <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Reach</span></label>
+        <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Retrátil</span></label>
+        <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Plataforma Elevatória</span></label>
       </div>
-      <div class="two-col-item">
-        <div style="display:flex; flex-direction:column; gap:8px">
-          <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Empilhadeira (Combustão)</span></label>
-          <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Empilhadeira (Elétrica)</span></label>
-          <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Transpaleteira</span></label>
-          <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Paleteira</span></label>
-          <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Reach</span></label>
-          <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Retrátil</span></label>
-          <label class="check-item" onclick="toggleCheck(this)"><span class="check-box"></span><span class="check-label">Plataforma Elevatória</span></label>
-          <div style="display:flex; align-items:center; gap:8px; margin-top:4px">
-            <span style="font-size:13px; color:var(--muted)">Outros:</span>
-            <input type="text" class="outros-input" placeholder="especificar...">
-          </div>
-        </div>
-      </div>
+      <div class="field"><label>Outros</label><input type="text" class="outros-input" style="width:100%" placeholder="especificar..."></div>
     </div>
   </div>
 
@@ -280,6 +328,7 @@
 
   <div class="card">
     <div class="section-header"><div class="dot"></div> Peças Utilizadas</div>
+    <div class="parts-scroll-wrap">
     <div class="parts-header">
       <span>Descrição da Peça</span>
       <span>Cód. / Referência</span>
@@ -310,6 +359,7 @@
         <input type="number" placeholder="0,00" step="0.01" readonly style="background:#f9fafb">
       </div>
     </div>
+    </div><!-- /parts-scroll-wrap -->
     <button class="add-row-btn" onclick="addPartRow()">+ Adicionar Peça</button>
     <div class="parts-total">
       <label>Total Peças:</label>
@@ -326,7 +376,7 @@
       <div class="valor-item"><label>Deslocamento (R$)</label><input type="number" id="vDesloc" placeholder="0,00" step="0.01" oninput="calcTotal()"></div>
       <div class="valor-item"><label>Peças (R$)</label><input type="number" id="vPecas" placeholder="0,00" step="0.01" oninput="calcTotal()"></div>
       <div class="valor-item"><label>Outros (R$)</label><input type="number" id="vOutros" placeholder="0,00" step="0.01" oninput="calcTotal()"></div>
-      <div class="valor-item" style="min-width:160px"><label style="color:#aab">Total (R$)</label><input type="text" id="vTotal" placeholder="R$ 0,00" readonly></div>
+      <div class="valor-item valor-total-full" style="min-width:160px; background:var(--dark)"><label style="color:#aab">Total (R$)</label><input type="text" id="vTotal" placeholder="R$ 0,00" readonly style="background:var(--dark);color:white;border-color:var(--mid);font-size:17px"></div>
     </div>
   </div>
 
@@ -401,7 +451,6 @@
     `;
     document.getElementById('partsBody').appendChild(row);
   }
-
   function calcTotalPeca(input) {
     const row = input.closest('.parts-row');
     const inputs = row.querySelectorAll('input[type="number"]');
