@@ -699,7 +699,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script type="module">
   // Set today's date
   document.getElementById('dataOS').valueAsDate = new Date();
 
@@ -806,8 +806,23 @@
     'nomeCliente','rgCliente','nomeTecnico','cpfTecnico'
   ];
 
-  // Gera link único com todos os dados embutidos
-  function gerarLink() {
+  // ========== FIREBASE ==========
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCYNXzPZdTGCREW1ipOixaKeuWUv9MlH6w",
+    authDomain: "antunes-os.firebaseapp.com",
+    projectId: "antunes-os",
+    storageBucket: "antunes-os.firebasestorage.app",
+    messagingSenderId: "1093545618743",
+    appId: "1:1093545618743:web:107729575d9768c8e63eb2"
+  };
+  const fbApp = initializeApp(firebaseConfig);
+  const db = getFirestore(fbApp);
+
+  // Coleta todos os dados do formulário
+  function coletarDados() {
     const dados = {};
     FIELD_IDS.forEach(id => {
       const el = document.getElementById(id);
@@ -826,42 +841,52 @@
       pecas.push([...row.querySelectorAll('input')].map(i => i.value));
     });
     dados._pecas = pecas;
-    const json = JSON.stringify(dados);
-    const base64 = btoa(unescape(encodeURIComponent(json)));
-    return 'https://gustavo-ribeiro-antunes.github.io/ordem-de-servico?os=' + base64;
+    return dados;
   }
 
-  // Carrega dados da URL ao abrir
-  function carregarDaURL() {
-    const params = new URLSearchParams(window.location.search);
-    const base64 = params.get('os');
-    if (!base64) return;
-    try {
-      const json = decodeURIComponent(escape(atob(base64)));
-      const dados = JSON.parse(json);
-      FIELD_IDS.forEach(id => {
-        const el = document.getElementById(id);
-        if (el && dados[id] !== undefined) el.value = dados[id];
+  // Preenche o formulário com dados salvos
+  function preencherForm(dados) {
+    FIELD_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && dados[id] !== undefined) el.value = dados[id];
+    });
+    if (dados._checks) {
+      const items = document.querySelectorAll('.check-item');
+      dados._checks.forEach(i => { if (items[i]) items[i].classList.add('checked'); });
+    }
+    if (dados._outros) {
+      const outros = document.querySelectorAll('.outros-input');
+      dados._outros.forEach((v, i) => { if (outros[i]) outros[i].value = v; });
+    }
+    if (dados._pecas && dados._pecas.length) {
+      const tbody = document.getElementById('partsBody');
+      while (tbody.querySelectorAll('.parts-row').length < dados._pecas.length) addPartRow();
+      tbody.querySelectorAll('.parts-row').forEach((row, ri) => {
+        if (!dados._pecas[ri]) return;
+        const inputs = row.querySelectorAll('input');
+        dados._pecas[ri].forEach((v, ci) => { if (inputs[ci]) inputs[ci].value = v; });
       });
-      if (dados._checks) {
-        const items = document.querySelectorAll('.check-item');
-        dados._checks.forEach(i => { if (items[i]) items[i].classList.add('checked'); });
+    }
+  }
+
+  // Carrega OS do Firebase se houver ?os=ID na URL
+  async function carregarDaURL() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('os');
+    if (!id) return;
+    try {
+      showToast('Carregando OS...');
+      const snap = await getDoc(doc(db, 'ordens', id));
+      if (snap.exists()) {
+        preencherForm(snap.data());
+        showToast('OS carregada com sucesso!');
+      } else {
+        showToast('OS não encontrada.');
       }
-      if (dados._outros) {
-        const outros = document.querySelectorAll('.outros-input');
-        dados._outros.forEach((v, i) => { if (outros[i]) outros[i].value = v; });
-      }
-      if (dados._pecas && dados._pecas.length) {
-        const tbody = document.getElementById('partsBody');
-        while (tbody.querySelectorAll('.parts-row').length < dados._pecas.length) addPartRow();
-        tbody.querySelectorAll('.parts-row').forEach((row, ri) => {
-          if (!dados._pecas[ri]) return;
-          const inputs = row.querySelectorAll('input');
-          dados._pecas[ri].forEach((v, ci) => { if (inputs[ci]) inputs[ci].value = v; });
-        });
-      }
-      showToast('OS carregada com sucesso!');
-    } catch(e) { console.error('Erro ao carregar OS da URL', e); }
+    } catch(e) {
+      console.error(e);
+      showToast('Erro ao carregar OS.');
+    }
   }
 
   window.addEventListener('load', () => {
@@ -870,25 +895,42 @@
     carregarDaURL();
   });
 
-  // Compartilhar via WhatsApp — link na última linha sozinho vira preview
-  function compartilhar() {
-    const numOS = document.getElementById('numOS').value || 'OS';
+  // Salva no Firebase e envia link curto pelo WhatsApp
+  async function compartilhar() {
+    const numOS = document.getElementById('numOS').value.trim();
+    if (!numOS) { showToast('Preencha o Nº da OS antes de enviar!'); return; }
+
     const cliente = document.getElementById('cliente').value || 'cliente';
     const data = document.getElementById('dataOS').value
       ? new Date(document.getElementById('dataOS').value + 'T12:00:00').toLocaleDateString('pt-BR') : '';
-    const link = gerarLink();
 
-    // Link fica na última linha, sozinho — WhatsApp gera preview automático
-    // e NÃO exibe a URL longa no corpo da mensagem
-    const texto =
-      'Olá, *' + cliente + '*! 👋\n\n' +
-      '📋 *OS ' + numOS + '* – Antunes Lift Solutions\n' +
-      '📅 ' + data + '\n\n' +
-      '👇 Toque para visualizar e assinar:\n\n' +
-      link;
+    showToast('Salvando OS, aguarde...');
 
-    // Sempre usa wa.me para evitar que navigator.share cole o link duplicado
-    window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
+    try {
+      const dados = coletarDados();
+      // ID do documento = número da OS (ex: "OS-001")
+      const docId = numOS.replace(/[^a-zA-Z0-9_-]/g, '_');
+      await setDoc(doc(db, 'ordens', docId), dados);
+
+      const link = 'https://gustavo-ribeiro-antunes.github.io/ordem-de-servico?os=' + docId;
+
+      const texto =
+        'Olá, *' + cliente + '*! 👋\n\n' +
+        '📋 *OS ' + numOS + '* – Antunes Lift Solutions\n' +
+        '📅 ' + data + '\n\n' +
+        '👇 Toque para visualizar e assinar digitalmente:\n' +
+        link + '\n\n' +
+        '📞 47 99248-2740';
+
+      showToast('OS salva! Abrindo WhatsApp...');
+      setTimeout(() => {
+        window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
+      }, 800);
+
+    } catch(e) {
+      console.error(e);
+      showToast('Erro ao salvar OS. Verifique sua conexão.');
+    }
   }
 
   function limparForm() {
