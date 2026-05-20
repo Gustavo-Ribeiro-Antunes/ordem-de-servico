@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Checklist – Manutenção Preventiva – Antunes Lift Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #C8102E;
+    --dark: #1a1a2e;
+    --darker: #0f0f1a;
+    --mid: #2a2a40;
+    --light-bg: #f4f6fa;
+    --border: #d0d5e8;
+    --text: #1e1e2e;
+    --muted: #6b7280;
+    --white: #ffffff;
+    --input-bg: #ffffff;
+    --ok: #16a34a;
+    --atencao: #d97706;
+    --naook: #dc2626;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Barlow', sans-serif; background: var(--light-bg); color: var(--text); min-height: 100vh; padding-bottom: 40px; }
+
+  /* HEADER */
+  .header { background: var(--dark); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.4); }
+  .header-logo { display: flex; align-items: center; gap: 10px; }
+  .logo-box { background: var(--red); width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; color: white; font-size: 18px; }
+  .logo-text { color: white; }
+  .logo-text strong { display: block; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: 1px; }
+  .logo-text span { font-size: 10px; color: #aab; letter-spacing: 2px; text-transform: uppercase; }
+  .header-center { text-align: center; }
+  .header-title { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 800; color: white; letter-spacing: 1px; text-transform: uppercase; }
+  .header-sub { font-size: 11px; color: #aab; letter-spacing: 2px; text-transform: uppercase; }
+  .header-contact { text-align: right; display: flex; flex-direction: column; gap: 2px; }
+  .header-contact span { font-size: 12px; color: #ccd; }
+  .header-contact strong { color: white; }
+
+  /* ACTIONS BAR */
+  .actions-bar { background: var(--red); padding: 10px 16px; display: flex; gap: 8px; justify-content: flex-end; position: sticky; top: 68px; z-index: 99; }
+  .btn { padding: 9px 18px; border-radius: 6px; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 13px; border: none; cursor: pointer; transition: all .15s; letter-spacing: .5px; text-transform: uppercase; }
+  .btn-primary { background: white; color: var(--red); }
+  .btn-primary:active { background: #ffe0e4; }
+  .btn-ghost { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.4); }
+  .btn-ghost:active { background: rgba(255,255,255,0.3); }
+
+  /* FORM */
+  .form-container { max-width: 820px; margin: 20px auto; padding: 0 12px; display: flex; flex-direction: column; gap: 16px; }
+  .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.07); border: 1px solid var(--border); }
+  .section-header { background: var(--dark); color: white; padding: 10px 16px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+  .section-header .icon { font-size: 16px; }
+  .section-header .dot { width: 6px; height: 6px; background: var(--red); border-radius: 50%; }
+  .fields { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
+  .field.w25 { flex: 0 0 calc(25% - 8px); }
+  .field.w33 { flex: 0 0 calc(33.3% - 7px); }
+  .field.w50 { flex: 0 0 calc(50% - 5px); }
+  .field.w66 { flex: 0 0 calc(66.6% - 5px); }
+
+  label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+  input[type="text"], input[type="date"], textarea, select {
+    width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 6px;
+    font-family: 'Barlow', sans-serif; font-size: 15px; color: var(--text); background: var(--input-bg);
+    -webkit-appearance: none; transition: border-color .15s; outline: none;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--red); }
+
+  /* TIPO checkbox inline */
+  .tipo-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 2px; }
+  .tipo-check { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
+  .tipo-check input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--red); cursor: pointer; }
+
+  /* CHECKLIST TABLE */
+  .checklist-section { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 0; }
+  .checklist-header { background: var(--dark); color: white; display: grid; grid-template-columns: 1fr 60px 70px 70px; padding: 8px 14px; }
+  .checklist-header span { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #aab; text-align: center; }
+  .checklist-header span:first-child { text-align: left; color: white; font-size: 11px; }
+
+  .cl-row { display: grid; grid-template-columns: 1fr 60px 70px 70px; align-items: center; padding: 0 14px; border-bottom: 1px solid #eef0f8; transition: background .1s; }
+  .cl-row:last-child { border-bottom: none; }
+  .cl-row:hover { background: #fafbff; }
+
+  .cl-label { display: flex; align-items: center; gap: 8px; padding: 9px 0; font-size: 13.5px; font-weight: 500; color: var(--text); }
+  .cl-num { width: 20px; height: 20px; background: #f0f2f8; border: 1.5px solid var(--border); border-radius: 4px; flex-shrink: 0; cursor: pointer; transition: all .15s; }
+  .cl-num.checked-item { background: var(--red); border-color: var(--red); }
+
+  .cl-cell { display: flex; justify-content: center; align-items: center; padding: 6px 4px; }
+
+  /* Radio tri-state */
+  .tri-radio { display: flex; gap: 0; }
+  .tri-btn { width: 26px; height: 26px; border: 2px solid var(--border); background: white; cursor: pointer; font-size: 10px; font-weight: 900; transition: all .15s; display: flex; align-items: center; justify-content: center; }
+  .tri-btn:first-child { border-radius: 5px 0 0 5px; }
+  .tri-btn:last-child { border-radius: 0 5px 5px 0; }
+  .tri-btn.active-ok { background: var(--ok); border-color: var(--ok); color: white; }
+  .tri-btn.active-atencao { background: var(--atencao); border-color: var(--atencao); color: white; }
+  .tri-btn.active-naook { background: var(--naook); border-color: var(--naook); color: white; }
+  .tri-btn:not(.active-ok):not(.active-atencao):not(.active-naook):hover { background: #f0f2f8; }
+
+  /* Two-col checklist layout */
+  .cl-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .cl-block { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  .cl-block-header { background: var(--dark); color: white; padding: 8px 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+  .cl-block-header .icon { font-size: 14px; }
+
+  .cl-col-header { display: grid; grid-template-columns: 1fr 40px 50px 50px; padding: 5px 10px; background: #f0f2f8; border-bottom: 1px solid var(--border); }
+  .cl-col-header span { font-size: 9px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--muted); text-align: center; }
+  .cl-col-header span:first-child { text-align: left; }
+
+  .cl-col-row { display: grid; grid-template-columns: 1fr 40px 50px 50px; align-items: center; padding: 0 10px; border-bottom: 1px solid #eef0f8; }
+  .cl-col-row:last-child { border-bottom: none; }
+  .cl-col-row:hover { background: #fafbff; }
+  .cl-col-label { font-size: 12.5px; font-weight: 500; padding: 8px 0; }
+  .cl-col-cell { display: flex; justify-content: center; align-items: center; padding: 4px 2px; }
+
+  .tri-sm { display: flex; gap: 0; }
+  .tri-sm-btn { width: 22px; height: 22px; border: 1.5px solid var(--border); background: white; cursor: pointer; font-size: 9px; font-weight: 900; transition: all .15s; display: flex; align-items: center; justify-content: center; }
+  .tri-sm-btn:first-child { border-radius: 4px 0 0 4px; }
+  .tri-sm-btn:last-child { border-radius: 0 4px 4px 0; }
+  .tri-sm-btn.active-ok { background: var(--ok); border-color: var(--ok); color: white; }
+  .tri-sm-btn.active-atencao { background: var(--atencao); border-color: var(--atencao); color: white; }
+  .tri-sm-btn.active-naook { background: var(--naook); border-color: var(--naook); color: white; }
+
+  /* RESULTADO */
+  .resultado-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .resultado-obs { padding: 14px 16px; border-right: 1px solid var(--border); }
+  .resultado-status { padding: 14px 16px; }
+  .result-option { display: flex; align-items: flex-start; gap: 10px; padding: 8px 12px; border-radius: 6px; border: 2px solid var(--border); cursor: pointer; transition: all .15s; margin-bottom: 8px; }
+  .result-option:last-child { margin-bottom: 0; }
+  .result-option.selected-ok { border-color: var(--ok); background: #f0fdf4; }
+  .result-option.selected-atencao { border-color: var(--atencao); background: #fffbeb; }
+  .result-option.selected-naook { border-color: var(--naook); background: #fef2f2; }
+  .result-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; margin-top: 1px; transition: all .15s; }
+  .result-option.selected-ok .result-dot { background: var(--ok); border-color: var(--ok); }
+  .result-option.selected-atencao .result-dot { background: var(--atencao); border-color: var(--atencao); }
+  .result-option.selected-naook .result-dot { background: var(--naook); border-color: var(--naook); }
+  .result-text strong { display: block; font-size: 13px; font-weight: 700; }
+  .result-text span { font-size: 11px; color: var(--muted); }
+
+  .prox-prev { background: #f0f2f8; border-radius: 6px; padding: 10px 12px; margin-top: 10px; }
+  .prox-prev label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; }
+  .prox-prev-row { display: flex; gap: 8px; }
+
+  /* TESTE FINAL */
+  .teste-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--border); }
+  .teste-item { padding: 12px 14px; border-right: 1px solid var(--border); }
+  .teste-item:last-child { border-right: none; }
+  .teste-item label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin-bottom: 8px; }
+  .teste-buttons { display: flex; flex-direction: column; gap: 6px; }
+  .teste-btn { display: flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 5px; border: 1.5px solid var(--border); cursor: pointer; font-size: 12px; font-weight: 600; transition: all .15s; background: white; }
+  .teste-btn .dot-sm { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--border); flex-shrink: 0; transition: all .15s; }
+  .teste-btn.sel-ok { border-color: var(--ok); background: #f0fdf4; }
+  .teste-btn.sel-ok .dot-sm { background: var(--ok); border-color: var(--ok); }
+  .teste-btn.sel-atencao { border-color: var(--atencao); background: #fffbeb; }
+  .teste-btn.sel-atencao .dot-sm { background: var(--atencao); border-color: var(--atencao); }
+  .teste-btn.sel-naook { border-color: var(--naook); background: #fef2f2; }
+  .teste-btn.sel-naook .dot-sm { background: var(--naook); border-color: var(--naook); }
+
+  /* PROGRESS */
+  .progress-bar-wrap { background: rgba(255,255,255,0.15); border-radius: 4px; height: 6px; width: 120px; overflow: hidden; }
+  .progress-bar { background: white; height: 100%; border-radius: 4px; transition: width .3s; }
+  .progress-label { font-size: 11px; color: #ccd; }
+
+  /* ASSINATURAS */
+  .sig-container { display: grid; grid-template-columns: 1fr 1fr; }
+  .sig-box { padding: 16px; }
+  .sig-box:first-child { border-right: 1px solid var(--border); }
+  .sig-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .sig-canvas-wrap { border: 2px dashed var(--border); border-radius: 8px; overflow: hidden; background: #f9fafb; position: relative; }
+  canvas.sig-pad { display: block; width: 100%; height: 120px; touch-action: none; cursor: crosshair; }
+  .sig-clear { position: absolute; top: 6px; right: 6px; background: rgba(200,16,46,0.1); color: var(--red); border: 1px solid rgba(200,16,46,0.3); border-radius: 4px; padding: 3px 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
+  .sig-fields { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+
+  /* FOOTER */
+  .footer-card { background: var(--dark); color: white; padding: 16px 20px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .footer-slogan { font-size: 13px; color: #aab; line-height: 1.5; }
+  .footer-contact { display: flex; flex-direction: column; gap: 4px; text-align: right; }
+  .footer-contact span { font-size: 13px; color: #ccd; }
+  .footer-contact strong { color: white; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--dark); color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 999; opacity: 0; pointer-events: none; transition: opacity .3s; white-space: nowrap; }
+  .toast.show { opacity: 1; }
+
+  textarea { resize: vertical; min-height: 70px; line-height: 1.5; }
+
+  /* LEGEND */
+  .legend { display: flex; align-items: center; gap: 14px; padding: 8px 14px; background: #f9fafb; border-top: 1px solid var(--border); flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+  @media (max-width: 600px) {
+    .header { padding: 10px 12px; flex-wrap: wrap; gap: 6px; }
+    .header-title { font-size: 17px; }
+    .header-contact { display: none; }
+    .actions-bar { top: 56px; flex-wrap: wrap; }
+    .btn { padding: 9px 12px; font-size: 12px; flex: 1; text-align: center; }
+    .cl-two-col { grid-template-columns: 1fr; }
+    .resultado-grid { grid-template-columns: 1fr; }
+    .resultado-obs { border-right: none; border-bottom: 1px solid var(--border); }
+    .sig-container { grid-template-columns: 1fr; }
+    .sig-box:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    .field.w25, .field.w33, .field.w50, .field.w66 { flex: 0 0 100%; }
+    .row { flex-direction: column; }
+    .teste-grid { grid-template-columns: 1fr 1fr; }
+    .teste-item:nth-child(2n) { border-right: none; }
+    .teste-item:nth-child(n+3) { border-top: 1px solid var(--border); }
+    .progress-bar-wrap { display: none; }
+  }
+
+  @media print {
+    .actions-bar, .sig-clear, .btn, .legend { display: none !important; }
+    .header { position: static; }
+    body { background: white; }
+    .card { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">
+    <div class="logo-box">A</div>
+    <div class="logo-text">
+      <strong>ANTUNES</strong>
+      <span>Lift Solutions</span>
+    </div>
+  </div>
+  <div class="header-center">
+    <div class="header-title">Checklist</div>
+    <div class="header-sub">Manutenção Preventiva</div>
+  </div>
+  <div class="header-contact">
+    <span>📱 <strong>47 99248-2740</strong></span>
+    <span>📸 <strong>AntunesLiftSolutions</strong></span>
+  </div>
+</div>
+
+<div class="actions-bar">
+  <div style="flex:1;display:flex;flex-direction:column;gap:2px;justify-content:center">
+    <div class="progress-label" id="progressLabel">0 de 0 itens avaliados</div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+  </div>
+  <button class="btn btn-ghost" onclick="limparForm()">Limpar</button>
+  <button class="btn btn-ghost" onclick="window.print()">Imprimir</button>
+  <button class="btn btn-primary" onclick="compartilhar()">📤 Enviar</button>
+</div>
+
+<div class="form-container">
+
+  <!-- IDENTIFICAÇÃO -->
+  <div class="card">
+    <div class="section-header"><div class="dot"></div> Identificação</div>
+    <div class="fields">
+      <div class="row">
+        <div class="field w33"><label>Nº OS</label><input type="text" id="numOS" placeholder="OS-0001"></div>
+        <div class="field w33"><label>Data</label><input type="date" id="dataOS"></div>
+        <div class="field w33"><label>Horímetro</label><input type="text" id="horimetro" placeholder="Ex: 2350h"></div>
+      </div>
+      <div class="row">
+        <div class="field w66"><label>Cliente</label><input type="text" id="cliente" placeholder="Nome ou razão social"></div>
+        <div class="field w33"><label>Nº Frota</label><input type="text" id="frota" placeholder="Nº frota"></div>
+      </div>
+      <div class="row">
+        <div class="field w66"><label>Equipamento</label><input type="text" id="equipamento" placeholder="Ex: Empilhadeira Toyota"></div>
+        <div class="field w33"><label>Marca</label><input type="text" id="marca" placeholder="Ex: Toyota"></div>
+      </div>
+      <div class="row">
+        <div class="field w33"><label>Modelo</label><input type="text" id="modelo" placeholder="Ex: 8FBE18"></div>
+        <div class="field w33"><label>Nº Série / Patrimônio</label><input type="text" id="serie" placeholder="Nº série"></div>
+        <div class="field w33">
+          <label>Tipo</label>
+          <div class="tipo-group">
+            <label class="tipo-check"><input type="checkbox" name="tipo" value="GLP"> GLP</label>
+            <label class="tipo-check"><input type="checkbox" name="tipo" value="DIESEL"> Diesel</label>
+            <label class="tipo-check"><input type="checkbox" name="tipo" value="ELETRICA"> Elétrica</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST SECTIONS (2x2 grid blocks) -->
+
+  <!-- Seções 1 e 2 -->
+  <div class="card">
+    <div class="fields" style="gap:12px">
+      <div class="cl-two-col">
+        <!-- Seção 1: Motor GLP/Diesel -->
+        <div class="cl-block">
+          <div class="cl-block-header"><span class="icon">⚙️</span> 1. Motor (GLP / Diesel)</div>
+          <div class="cl-col-header">
+            <span>Item</span><span>OK</span><span>Atenção</span><span>Não OK</span>
+          </div>
+          <div id="sec1">
+            <div class="cl-col-row" data-sec="1"><span class="cl-col-label">Nível de óleo do motor</span><div class="cl-col-cell"><div class="tri-sm" data-ok><button class="tri-sm-btn" onclick="triToggle(this,'ok')" title="OK">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')" title="Atenção">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')" title="Não OK">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="1"><span class="cl-col-label">Vazamentos visíveis</span><div class="cl-col-cell"><div class="tri-sm" data-ok><button class="tri-sm-btn" onclick="triToggle(this,'ok')" title="OK">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')" title="Atenção">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')" title="Não OK">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="1"><span class="cl-col-label">Filtro de óleo</span><div class="cl-col-cell"><div class="tri-sm" data-ok><button class="tri-sm-btn" onclick="triToggle(this,'ok')" title="OK">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')" title="Atenção">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')" title="Não OK">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="1"><span class="cl-col-label">Filtro de ar</span><div class="cl-col-cell"><div class="tri-sm" data-ok><button class="tri-sm-btn" onclick="triToggle(this,'ok')" title="OK">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')" title="Atenção">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')" title="Não OK">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="1"><span class="cl-col-label">Filtro de combustível</span><div class="cl-col-cell"><div class="tri-sm" data-ok><button class="tri-sm-btn" onclick="triToggle(this,'ok')" title="OK">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')" title="Atenção">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')" title="Não OK">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="1"><span class="cl-col-label">Correias (tensão / desgaste)</span><div class="cl-col-cell"><div class="tri-sm" data-ok><button class="tri-sm-btn" onclick="triToggle(this,'ok')" title="OK">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')" title="Atenção">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')" title="Não OK">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="1"><span class="cl-col-label">Sistema de arrefecimento</span><div class="cl-col-cell"><div class="tri-sm" data-ok><button class="tri-sm-btn" onclick="triToggle(this,'ok')" title="OK">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')" title="Atenção">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')" title="Não OK">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="1"><span class="cl-col-label">Velas / Aquecedor (diesel)</span><div class="cl-col-cell"><div class="tri-sm" data-ok><button class="tri-sm-btn" onclick="triToggle(this,'ok')" title="OK">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')" title="Atenção">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')" title="Não OK">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+          </div>
+        </div>
+
+        <!-- Seção 2: Sistema Elétrico -->
+        <div class="cl-block">
+          <div class="cl-block-header"><span class="icon">⚡</span> 2. Sistema Elétrico</div>
+          <div class="cl-col-header">
+            <span>Item</span><span>OK</span><span>Atenção</span><span>Não OK</span>
+          </div>
+          <div id="sec2">
+            <div class="cl-col-row" data-sec="2"><span class="cl-col-label">Bateria (carga / estado)</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="2"><span class="cl-col-label">Cabos e terminais</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="2"><span class="cl-col-label">Motor de partida</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="2"><span class="cl-col-label">Alternador</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="2"><span class="cl-col-label">Fusíveis e relés</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="2"><span class="cl-col-label">Luzes e sinalização</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="2"><span class="cl-col-label">Painel / Indicadores</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="2"><span class="cl-col-label">Chave geral / Contator</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seções 3 e 4 -->
+      <div class="cl-two-col">
+        <!-- Seção 3: Elétricas -->
+        <div class="cl-block">
+          <div class="cl-block-header"><span class="icon">🔋</span> 3. Elétricas (se aplicável)</div>
+          <div class="cl-col-header">
+            <span>Item</span><span>OK</span><span>Atenção</span><span>Não OK</span>
+          </div>
+          <div id="sec3">
+            <div class="cl-col-row" data-sec="3"><span class="cl-col-label">Nível da água da bateria</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="3"><span class="cl-col-label">Equalização</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="3"><span class="cl-col-label">Cabos de tração</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="3"><span class="cl-col-label">Conectores</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="3"><span class="cl-col-label">Controlador</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="3"><span class="cl-col-label">Frenagem regenerativa</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+          </div>
+        </div>
+
+        <!-- Seção 4: Sistema Hidráulico -->
+        <div class="cl-block">
+          <div class="cl-block-header"><span class="icon">💧</span> 4. Sistema Hidráulico</div>
+          <div class="cl-col-header">
+            <span>Item</span><span>OK</span><span>Atenção</span><span>Não OK</span>
+          </div>
+          <div id="sec4">
+            <div class="cl-col-row" data-sec="4"><span class="cl-col-label">Nível do óleo hidráulico</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="4"><span class="cl-col-label">Vazamentos</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="4"><span class="cl-col-label">Mangueiras e conexões</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="4"><span class="cl-col-label">Cilindros (elevação / inclinação)</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="4"><span class="cl-col-label">Bomba hidráulica</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="4"><span class="cl-col-label">Válvula de controle</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="4"><span class="cl-col-label">Funcionamento da elevação</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="4"><span class="cl-col-label">Funcionamento da inclinação</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seções 5 e 6 -->
+      <div class="cl-two-col">
+        <!-- Seção 5: Freios e Direção -->
+        <div class="cl-block">
+          <div class="cl-block-header"><span class="icon">🎯</span> 5. Freios e Direção</div>
+          <div class="cl-col-header">
+            <span>Item</span><span>OK</span><span>Atenção</span><span>Não OK</span>
+          </div>
+          <div id="sec5">
+            <div class="cl-col-row" data-sec="5"><span class="cl-col-label">Freio de serviço</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="5"><span class="cl-col-label">Freio de estacionamento</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="5"><span class="cl-col-label">Pedal / Alavanca</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="5"><span class="cl-col-label">Sistema de direção (folga)</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="5"><span class="cl-col-label">Óleo da direção hidráulica</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="5"><span class="cl-col-label">Válvula de segurança</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+          </div>
+        </div>
+
+        <!-- Seção 6: Estrutura -->
+        <div class="cl-block">
+          <div class="cl-block-header"><span class="icon">🏗️</span> 6. Estrutura</div>
+          <div class="cl-col-header">
+            <span>Item</span><span>OK</span><span>Atenção</span><span>Não OK</span>
+          </div>
+          <div id="sec6">
+            <div class="cl-col-row" data-sec="6"><span class="cl-col-label">Garfos (desgaste / trincas)</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="6"><span class="cl-col-label">Torre (folgas / trincas)</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="6"><span class="cl-col-label">Correntes (desgaste / tensão)</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="6"><span class="cl-col-label">Rolos e guias</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="6"><span class="cl-col-label">Pinos e buchas</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="6"><span class="cl-col-label">Rolamentos</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seções 7 e 8 -->
+      <div class="cl-two-col">
+        <!-- Seção 7: Rodagem -->
+        <div class="cl-block">
+          <div class="cl-block-header"><span class="icon">🔘</span> 7. Rodagem</div>
+          <div class="cl-col-header">
+            <span>Item</span><span>OK</span><span>Atenção</span><span>Não OK</span>
+          </div>
+          <div id="sec7">
+            <div class="cl-col-row" data-sec="7"><span class="cl-col-label">Pneus dianteiros (estado)</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="7"><span class="cl-col-label">Pneus traseiros (estado)</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="7"><span class="cl-col-label">Porcas de fixação</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="7"><span class="cl-col-label">Rodas e rolamentos</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+          </div>
+        </div>
+
+        <!-- Seção 8: Lubrificação e Demais -->
+        <div class="cl-block">
+          <div class="cl-block-header"><span class="icon">🔧</span> 8. Lubrificação e Demais</div>
+          <div class="cl-col-header">
+            <span>Item</span><span>OK</span><span>Atenção</span><span>Não OK</span>
+          </div>
+          <div id="sec8">
+            <div class="cl-col-row" data-sec="8"><span class="cl-col-label">Pontos de lubrificação</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="8"><span class="cl-col-label">Articulações</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="8"><span class="cl-col-label">Correntes</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="8"><span class="cl-col-label">Limpeza geral</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+            <div class="cl-col-row" data-sec="8"><span class="cl-col-label">Parafusos e fixações</span><div class="cl-col-cell"><div class="tri-sm"><button class="tri-sm-btn" onclick="triToggle(this,'ok')">✓</button><button class="tri-sm-btn" onclick="triToggle(this,'at')">!</button><button class="tri-sm-btn" onclick="triToggle(this,'no')">✗</button></div></div><div class="cl-col-cell"></div><div class="cl-col-cell"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legenda -->
+      <div class="legend">
+        <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-right:4px">Legenda:</span>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--ok)"></div> OK</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--atencao)"></div> Atenção</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--naook)"></div> Não OK</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OBSERVAÇÕES e RESULTADO -->
+  <div class="card">
+    <div class="section-header"><div class="dot"></div> Observações / Recomendações & Resultado da Inspeção</div>
+    <div class="resultado-grid">
+      <div class="resultado-obs">
+        <label style="display:block;margin-bottom:6px">Observações / Recomendações</label>
+        <textarea id="obs" placeholder="Observações adicionais ou recomendações para o cliente..." rows="5"></textarea>
+      </div>
+      <div class="resultado-status">
+        <label style="display:block;margin-bottom:8px">Resultado da Inspeção</label>
+        <div class="result-option" id="resOK" onclick="selectResultado('ok')">
+          <div class="result-dot"></div>
+          <div class="result-text">
+            <strong>OK</strong>
+            <span>Equipamento em boas condições</span>
+          </div>
+        </div>
+        <div class="result-option" id="resAtencao" onclick="selectResultado('at')">
+          <div class="result-dot"></div>
+          <div class="result-text">
+            <strong>ATENÇÃO</strong>
+            <span>Necessita acompanhamento</span>
+          </div>
+        </div>
+        <div class="result-option" id="resNaoOK" onclick="selectResultado('no')">
+          <div class="result-dot"></div>
+          <div class="result-text">
+            <strong>NÃO OK</strong>
+            <span>Necessita manutenção corretiva</span>
+          </div>
+        </div>
+        <div class="prox-prev">
+          <label>Próxima Preventiva Recomendada</label>
+          <div class="prox-prev-row">
+            <input type="date" id="proxData" style="flex:1">
+            <input type="text" id="proxHorimetro" placeholder="Horímetro" style="flex:1">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TESTE FINAL -->
+  <div class="card">
+    <div class="section-header"><div class="dot"></div> Teste Final</div>
+    <div class="teste-grid">
+      <div class="teste-item">
+        <label>Elevação</label>
+        <div class="teste-buttons" data-group="elevacao">
+          <button class="teste-btn" onclick="testeTri(this,'ok')"><div class="dot-sm"></div> OK</button>
+          <button class="teste-btn" onclick="testeTri(this,'at')"><div class="dot-sm"></div> Atenção</button>
+          <button class="teste-btn" onclick="testeTri(this,'no')"><div class="dot-sm"></div> Não OK</button>
+        </div>
+      </div>
+      <div class="teste-item">
+        <label>Translação</label>
+        <div class="teste-buttons" data-group="translacao">
+          <button class="teste-btn" onclick="testeTri(this,'ok')"><div class="dot-sm"></div> OK</button>
+          <button class="teste-btn" onclick="testeTri(this,'at')"><div class="dot-sm"></div> Atenção</button>
+          <button class="teste-btn" onclick="testeTri(this,'no')"><div class="dot-sm"></div> Não OK</button>
+        </div>
+      </div>
+      <div class="teste-item">
+        <label>Direção</label>
+        <div class="teste-buttons" data-group="direcao">
+          <button class="teste-btn" onclick="testeTri(this,'ok')"><div class="dot-sm"></div> OK</button>
+          <button class="teste-btn" onclick="testeTri(this,'at')"><div class="dot-sm"></div> Atenção</button>
+          <button class="teste-btn" onclick="testeTri(this,'no')"><div class="dot-sm"></div> Não OK</button>
+        </div>
+      </div>
+      <div class="teste-item">
+        <label>Inclinação</label>
+        <div class="teste-buttons" data-group="inclinacao">
+          <button class="teste-btn" onclick="testeTri(this,'ok')"><div class="dot-sm"></div> OK</button>
+          <button class="teste-btn" onclick="testeTri(this,'at')"><div class="dot-sm"></div> Atenção</button>
+          <button class="teste-btn" onclick="testeTri(this,'no')"><div class="dot-sm"></div> Não OK</button>
+        </div>
+      </div>
+      <div class="teste-item">
+        <label>Freios</label>
+        <div class="teste-buttons" data-group="freios">
+          <button class="teste-btn" onclick="testeTri(this,'ok')"><div class="dot-sm"></div> OK</button>
+          <button class="teste-btn" onclick="testeTri(this,'at')"><div class="dot-sm"></div> Atenção</button>
+          <button class="teste-btn" onclick="testeTri(this,'no')"><div class="dot-sm"></div> Não OK</button>
+        </div>
+      </div>
+      <div class="teste-item">
+        <label>Equipamento Geral</label>
+        <div class="teste-buttons" data-group="equipamento">
+          <button class="teste-btn" onclick="testeTri(this,'ok')"><div class="dot-sm"></div> OK</button>
+          <button class="teste-btn" onclick="testeTri(this,'at')"><div class="dot-sm"></div> Atenção</button>
+          <button class="teste-btn" onclick="testeTri(this,'no')"><div class="dot-sm"></div> Não OK</button>
+        </div>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="field"><label>Observações do Teste</label><input type="text" id="obsTeste" placeholder="Observações sobre o teste final..."></div>
+    </div>
+  </div>
+
+  <!-- ASSINATURAS -->
+  <div class="card">
+    <div class="section-header"><div class="dot"></div> Assinaturas</div>
+    <div class="sig-container">
+      <div class="sig-box">
+        <div class="sig-title">Assinatura do Técnico</div>
+        <div class="sig-canvas-wrap">
+          <canvas class="sig-pad" id="sigTecnico"></canvas>
+          <button class="sig-clear" onclick="clearSig('sigTecnico')">Limpar</button>
+        </div>
+        <div class="sig-fields">
+          <div class="field"><label>Nome</label><input type="text" id="nomeTecnico" placeholder="Nome do técnico"></div>
+          <div class="field"><label>RG / CPF</label><input type="text" id="cpfTecnico" placeholder="000.000.000-00"></div>
+        </div>
+      </div>
+      <div class="sig-box">
+        <div class="sig-title">Assinatura do Cliente</div>
+        <div class="sig-canvas-wrap">
+          <canvas class="sig-pad" id="sigCliente"></canvas>
+          <button class="sig-clear" onclick="clearSig('sigCliente')">Limpar</button>
+        </div>
+        <div class="sig-fields">
+          <div class="field"><label>Nome</label><input type="text" id="nomeCliente" placeholder="Nome completo"></div>
+          <div class="field"><label>RG / CPF</label><input type="text" id="rgCliente" placeholder="000.000.000-00"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-card">
+    <div>
+      <div style="font-weight:800;font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:1px">ANTUNES LIFT SOLUTIONS</div>
+      <div class="footer-slogan">Obrigado pela confiança!<br>Estamos aqui para elevar soluções e mover resultados junto com você.</div>
+    </div>
+    <div class="footer-contact">
+      <span>📱 <strong>47 99248-2740</strong></span>
+      <span>📸 <strong>AntunesLiftSolutions</strong></span>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ===== JSONBIN =====
+  const JSONBIN_KEY = '$2a$10$jVSHixZhOZznf8d/PswF/OrearG8KxOykNPCrFxRkk8uq40uN4pE6';
+  const JSONBIN_BASE = 'https://api.jsonbin.io/v3/b';
+
+  // ===== INIT =====
+  document.getElementById('dataOS').valueAsDate = new Date();
+
+  // ===== TRI TOGGLE (checklist items) =====
+  function triToggle(btn, type) {
+    const group = btn.closest('.tri-sm, .tri-sm');
+    const btns = group.querySelectorAll('button');
+    const classMap = { ok: 'active-ok', at: 'active-atencao', no: 'active-naook' };
+    const cls = classMap[type];
+    const alreadyActive = btn.classList.contains(cls);
+    btns.forEach(b => b.classList.remove('active-ok','active-atencao','active-naook'));
+    if (!alreadyActive) btn.classList.add(cls);
+    updateProgress();
+  }
+
+  // ===== TESTE FINAL =====
+  function testeTri(btn, type) {
+    const group = btn.closest('.teste-buttons');
+    const btns = group.querySelectorAll('.teste-btn');
+    const classMap = { ok: 'sel-ok', at: 'sel-atencao', no: 'sel-naook' };
+    const cls = classMap[type];
+    const alreadyActive = btn.classList.contains(cls);
+    btns.forEach(b => b.classList.remove('sel-ok','sel-atencao','sel-naook'));
+    if (!alreadyActive) btn.classList.add(cls);
+  }
+
+  // ===== RESULTADO DA INSPEÇÃO =====
+  let resultadoAtual = null;
+  function selectResultado(type) {
+    const map = { ok: ['resOK','selected-ok'], at: ['resAtencao','selected-atencao'], no: ['resNaoOK','selected-naook'] };
+    document.querySelectorAll('.result-option').forEach(el => el.classList.remove('selected-ok','selected-atencao','selected-naook'));
+    if (resultadoAtual === type) { resultadoAtual = null; return; }
+    const [id, cls] = map[type];
+    document.getElementById(id).classList.add(cls);
+    resultadoAtual = type;
+  }
+
+  // ===== PROGRESS =====
+  function updateProgress() {
+    const allGroups = document.querySelectorAll('.tri-sm');
+    const total = allGroups.length;
+    let filled = 0;
+    allGroups.forEach(g => {
+      const active = g.querySelector('.active-ok, .active-atencao, .active-naook');
+      if (active) filled++;
+    });
+    const pct = total ? Math.round(filled / total * 100) : 0;
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = filled + ' de ' + total + ' itens avaliados';
+  }
+  updateProgress();
+
+  // ===== ASSINATURAS =====
+  function initSigPad(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+    canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    ctx.strokeStyle = '#1a1a2e'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    let drawing = false, lastX = 0, lastY = 0;
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const src = e.touches ? e.touches[0] : e;
+      return [src.clientX - rect.left, src.clientY - rect.top];
+    }
+    canvas.addEventListener('mousedown', e => { drawing = true; [lastX, lastY] = getPos(e); });
+    canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; [lastX, lastY] = getPos(e); }, { passive: false });
+    canvas.addEventListener('mousemove', e => {
+      if (!drawing) return;
+      const [x,y] = getPos(e);
+      ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+      [lastX, lastY] = [x, y];
+    });
+    canvas.addEventListener('touchmove', e => {
+      e.preventDefault(); if (!drawing) return;
+      const [x,y] = getPos(e);
+      ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+      [lastX, lastY] = [x, y];
+    }, { passive: false });
+    canvas.addEventListener('mouseup', () => drawing = false);
+    canvas.addEventListener('touchend', () => drawing = false);
+    canvas.addEventListener('mouseleave', () => drawing = false);
+  }
+
+  function clearSig(id) {
+    const c = document.getElementById(id);
+    c.getContext('2d').clearRect(0, 0, c.width, c.height);
+  }
+
+  window.addEventListener('load', () => {
+    initSigPad('sigTecnico');
+    initSigPad('sigCliente');
+  });
+
+  // ===== LIMPAR =====
+  function limparForm() {
+    if (!confirm('Deseja realmente limpar todos os campos?')) return;
+    document.querySelectorAll('input[type="text"], input[type="date"], textarea').forEach(i => i.value = '');
+    document.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = false);
+    document.querySelectorAll('.tri-sm-btn').forEach(b => b.classList.remove('active-ok','active-atencao','active-naook'));
+    document.querySelectorAll('.teste-btn').forEach(b => b.classList.remove('sel-ok','sel-atencao','sel-naook'));
+    document.querySelectorAll('.result-option').forEach(el => el.classList.remove('selected-ok','selected-atencao','selected-naook'));
+    resultadoAtual = null;
+    clearSig('sigTecnico'); clearSig('sigCliente');
+    document.getElementById('dataOS').valueAsDate = new Date();
+    updateProgress();
+    showToast('✅ Formulário limpo!');
+  }
+
+  // ===== COLETAR DADOS =====
+  function coletarDados() {
+    const dados = {};
+    ['numOS','dataOS','horimetro','cliente','frota','equipamento','marca','modelo','serie','obs','obsTeste','proxData','proxHorimetro','nomeTecnico','cpfTecnico','nomeCliente','rgCliente'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) dados[id] = el.value;
+    });
+
+    // tipos
+    const tipos = [];
+    document.querySelectorAll('input[name="tipo"]:checked').forEach(i => tipos.push(i.value));
+    dados._tipos = tipos;
+
+    // checklist tri states
+    const checks = {};
+    document.querySelectorAll('.tri-sm').forEach((g, i) => {
+      const active = g.querySelector('.active-ok') ? 'ok' : g.querySelector('.active-atencao') ? 'at' : g.querySelector('.active-naook') ? 'no' : null;
+      if (active) checks[i] = active;
+    });
+    dados._checks = checks;
+
+    // teste final
+    const testes = {};
+    document.querySelectorAll('.teste-buttons').forEach(g => {
+      const grp = g.dataset.group;
+      const active = g.querySelector('.sel-ok') ? 'ok' : g.querySelector('.sel-atencao') ? 'at' : g.querySelector('.sel-naook') ? 'no' : null;
+      if (active) testes[grp] = active;
+    });
+    dados._testes = testes;
+
+    dados._resultado = resultadoAtual;
+    dados._sigTecnico = document.getElementById('sigTecnico').toDataURL();
+    dados._sigCliente = document.getElementById('sigCliente').toDataURL();
+    return dados;
+  }
+
+  // ===== ENVIAR =====
+  async function compartilhar() {
+    const numOS = document.getElementById('numOS').value.trim();
+    if (!numOS) { showToast('⚠️ Preencha o Nº da OS antes de enviar!'); return; }
+
+    const cliente = document.getElementById('cliente').value || 'cliente';
+    const dataVal = document.getElementById('dataOS').value;
+    const data = dataVal ? new Date(dataVal + 'T12:00:00').toLocaleDateString('pt-BR') : '';
+
+    showToast('💾 Salvando checklist, aguarde...');
+    try {
+      const dados = coletarDados();
+      const res = await fetch(JSONBIN_BASE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': JSONBIN_KEY,
+          'X-Bin-Name': 'CL-' + numOS,
+          'X-Bin-Private': 'false'
+        },
+        body: JSON.stringify(dados)
+      });
+      if (!res.ok) throw new Error('Erro ' + res.status);
+      const json = await res.json();
+      const binId = json.metadata.id;
+
+      const link = 'https://gustavo-ribeiro-antunes.github.io/ordem-de-servico/checklist?cl=' + binId;
+      const texto =
+        'Olá, *' + cliente + '*! 👋\n\n' +
+        '✅ *Checklist ' + numOS + '* – Antunes Lift Solutions\n' +
+        '📅 ' + data + '\n\n' +
+        '👇 Toque para visualizar o checklist:\n' +
+        link + '\n\n' +
+        '📞 47 99248-2740';
+
+      showToast('✅ Checklist salvo! Abrindo WhatsApp...');
+      setTimeout(() => window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank'), 800);
+    } catch(e) {
+      console.error(e);
+      showToast('❌ Erro ao salvar: ' + e.message);
+    }
+  }
+
+  // ===== TOAST =====
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+</script>
+</body>
+</html>
