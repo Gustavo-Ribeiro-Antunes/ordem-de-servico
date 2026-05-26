@@ -66,7 +66,7 @@ body { font-family: 'Barlow', sans-serif; background: var(--light-bg); color: va
 /* COLUNAS: peças */
 .pecas-cols { grid-template-columns: 78px 1fr 58px 96px 68px 68px 68px 68px 38px; }
 /* COLUNAS: empilhadeiras */
-.prog-cols { grid-template-columns: 1fr 108px 108px 108px 158px 120px 38px; }
+.prog-cols { grid-template-columns: 1fr 108px 108px 108px 180px 120px 38px; }
 /* COLUNAS: hora */
 .hora-cols { grid-template-columns: 1fr 90px 130px 130px 130px 130px; }
 
@@ -162,6 +162,17 @@ body { font-family: 'Barlow', sans-serif; background: var(--light-bg); color: va
 .mbtn-cancel:hover { background: #e0e4ee; }
 .form-err { font-size: 13px; color: var(--red); font-weight: 600; margin-right: auto; }
 
+/* ── SELECT TIPO PREVENTIVA ── */
+.prev-select {
+  border: none; border-right: 1px solid var(--border); padding: 0 10px;
+  font-family: 'Barlow', sans-serif; font-size: 13px; font-weight: 700;
+  color: var(--text); background: white; outline: none;
+  width: 100%; height: 100%; cursor: pointer;
+  appearance: auto; -webkit-appearance: auto;
+}
+.prev-select:focus { background: #fff8f8; }
+.prev-select option { font-weight: 600; }
+
 /* ── HORA NOTE ── */
 .nota { padding: 14px 18px; font-size: 13px; color: var(--muted); line-height: 1.7; }
 
@@ -177,21 +188,140 @@ body { font-family: 'Barlow', sans-serif; background: var(--light-bg); color: va
   .header { position: relative; top: 0; }
 }
 
-/* ── MOBILE ── */
+/* ══════════════════════════════════════════
+   MOBILE — até 620px
+══════════════════════════════════════════ */
 @media (max-width: 620px) {
-  .header { padding: 12px 14px; }
-  .header-title { font-size: 16px; }
-  .actions-bar { top: 60px; }
-  .tab-bar { top: 108px; }
-  .tab { font-size: 13px; min-width: 120px; padding: 11px 12px; }
-  .totals-grid, .cfg-grid { grid-template-columns: 1fr 1fr; }
-  .tot-item, .cfg-item { border-bottom: 1px solid var(--border); }
-  .pecas-cols { min-width: 720px; }
-  .prog-cols { min-width: 700px; }
-  .hora-cols { min-width: 660px; }
-  .r4 { grid-template-columns: 1fr 1fr; }
-  .modal-overlay { padding: 16px 8px; }
-  .modal-ft { flex-wrap: wrap; }
+
+  /* ── body ── */
+  body { padding-bottom: 80px; font-size: 14px; }
+
+  /* ── header ── */
+  .header { padding: 10px 14px; min-height: 54px; }
+  .logo-box { width: 32px; height: 32px; font-size: 16px; border-radius: 5px; }
+  .logo-text strong { font-size: 15px; }
+  .logo-text span { font-size: 9px; letter-spacing: 1.5px; }
+  .header-title { font-size: 14px; letter-spacing: .5px; }
+
+  /* ── actions bar ── */
+  .actions-bar { top: 54px; padding: 8px 12px; gap: 6px; justify-content: stretch; }
+  .btn { padding: 10px 12px; font-size: 12px; flex: 1; text-align: center; min-height: 40px; }
+
+  /* ── tabs ── */
+  .tab-bar { top: 102px; }
+  .tab { font-size: 12px; min-width: 100px; padding: 10px 10px; letter-spacing: .5px; }
+
+  /* ── main container ── */
+  .main { margin: 12px auto; padding: 0 10px; gap: 12px; }
+
+  /* ── cards ── */
+  .card { border-radius: 8px; }
+  .section-header { padding: 10px 14px; font-size: 13px; }
+  .sh-btn { padding: 6px 12px; font-size: 11px; min-height: 32px; }
+
+  /* ── tabelas: scroll horizontal com largura mínima ── */
+  .tbl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .pecas-cols  { min-width: 680px; }
+  .prog-cols   { min-width: 640px; }
+  .hora-cols   { min-width: 580px; }
+
+  /* ── cabeçalhos das tabelas ── */
+  .parts-header { padding: 7px 10px; }
+  .parts-header span { font-size: 9px; letter-spacing: .5px; }
+
+  /* ── linhas de tabela: inputs maiores para toque ── */
+  .parts-row input[type="text"],
+  .parts-row input[type="number"] {
+    padding: 11px 8px;
+    font-size: 13px;
+    min-height: 44px;
+  }
+  .ccell  { padding: 11px 8px; font-size: 13px; min-height: 44px; }
+  .ccell-r { padding: 11px 8px; font-size: 14px; min-height: 44px; }
+  .ccell-c { padding: 8px; min-height: 44px; }
+  .del-btn { font-size: 22px; padding: 6px 10px; min-height: 44px; min-width: 36px; }
+
+  /* ── select tipo preventiva ── */
+  .prev-select { font-size: 12px; padding: 0 6px; min-height: 44px; }
+
+  /* ── badge menor em mobile ── */
+  .badge { font-size: 10px; padding: 3px 7px; }
+
+  /* ── botão adicionar linha ── */
+  .add-row-btn { padding: 13px; font-size: 13px; min-height: 46px; }
+
+  /* ── footer de totais ── */
+  .parts-footer { padding: 10px 12px; gap: 8px; }
+  .parts-footer-label { font-size: 10px; }
+  .parts-footer-badges { gap: 6px; }
+  .total-footer { padding: 12px 14px; }
+  .total-footer .tf-label { font-size: 12px; }
+  .total-footer .tf-val { font-size: 20px; }
+
+  /* ── grids de totais: 2 colunas ── */
+  .totals-grid { grid-template-columns: 1fr 1fr; }
+  .tot-item { padding: 12px 14px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .tot-item:nth-child(2n) { border-right: none; }
+  .tot-item:last-child { border-bottom: none; border-right: none; }
+  .tot-item label { font-size: 9px; }
+  .tot-item .tv { font-size: 17px; }
+  .tot-item:last-child .tv { font-size: 18px; }
+  .tot-item .ts { font-size: 10px; }
+
+  /* ── grids de config (mão de obra): 2 colunas ── */
+  .cfg-grid { grid-template-columns: 1fr 1fr; }
+  .cfg-item { padding: 12px 14px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .cfg-item:nth-child(2n) { border-right: none; }
+  .cfg-item:last-child, .cfg-item:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+  .cfg-item label { font-size: 9px; margin-bottom: 6px; }
+  .cfg-item input { font-size: 16px; padding: 10px 8px; }
+
+  /* ── nota (aba hora) ── */
+  .nota { padding: 12px 14px; font-size: 12px; line-height: 1.6; }
+
+  /* ── modal: tela cheia no mobile ── */
+  .modal-overlay { padding: 0; align-items: flex-end; }
+  .modal {
+    border-radius: 16px 16px 0 0;
+    max-width: 100%;
+    max-height: 92dvh;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-hd { padding: 14px 16px; flex-shrink: 0; }
+  .modal-hd h2 { font-size: 15px; }
+  .modal-close { font-size: 26px; padding: 4px 8px; min-width: 40px; min-height: 40px; }
+  .modal-body {
+    padding: 16px;
+    gap: 12px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
+  }
+  .modal-ft { padding: 12px 16px; flex-wrap: wrap; flex-shrink: 0; }
+
+  /* ── inputs do modal: altura touch-friendly ── */
+  .fg input, .fg select { padding: 12px 12px; font-size: 16px; min-height: 48px; }
+  .fg label { font-size: 10px; }
+
+  /* ── grid 4 colunas → 2 colunas ── */
+  .r4 { grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  /* ── qtd-box ── */
+  .qtd-box { padding: 12px; }
+  .qtd-box-title { font-size: 10px; margin-bottom: 8px; }
+
+  /* ── preview preço ── */
+  .preview-row { padding: 9px 12px; }
+  .preview-lbl { font-size: 12px; }
+  .preview-val { font-size: 15px; }
+
+  /* ── botões do modal ── */
+  .mbtn { padding: 13px 18px; font-size: 13px; min-height: 48px; flex: 1; text-align: center; }
+  .mbtn-cancel { flex: 0 0 auto; }
+
+  /* ── toast ── */
+  .toast { bottom: 16px; font-size: 13px; padding: 11px 20px; max-width: 90vw; white-space: normal; text-align: center; }
 }
 </style>
 </head>
@@ -453,11 +583,11 @@ const PECAS_DEFAULT = [
   {cod:'P020',desc:'Kit de vedação / retentores',un:'KIT',preco:180,q1:0,q2:0,q3:0,q4:1},
 ];
 const EMPS_DEFAULT = [
-  {nome:'Empilhadeira 01',hor:2380,med:180},
-  {nome:'Empilhadeira 02',hor:940,med:160},
-  {nome:'Empilhadeira 03',hor:4720,med:200},
-  {nome:'Empilhadeira 04',hor:240,med:120},
-  {nome:'Empilhadeira 05',hor:1850,med:170},
+  {nome:'Empilhadeira 01',hor:2380,med:180,tipo:-1},
+  {nome:'Empilhadeira 02',hor:940,med:160,tipo:-1},
+  {nome:'Empilhadeira 03',hor:4720,med:200,tipo:-1},
+  {nome:'Empilhadeira 04',hor:240,med:120,tipo:-1},
+  {nome:'Empilhadeira 05',hor:1850,med:170,tipo:-1},
 ];
 
 /* ── UTILS ── */
@@ -478,6 +608,8 @@ function load(){
 
   try{const d=localStorage.getItem(EMPS_KEY);if(d)emps=JSON.parse(d);}catch(e){}
   if(!emps.length)emps=EMPS_DEFAULT.map(e=>({...e}));
+  // garantir campo tipo em registros antigos
+  emps.forEach(e=>{if(e.tipo===undefined)e.tipo=-1;});
 
   // aplica cfg aos inputs
   [1,2,3,4].forEach(i=>{
@@ -600,13 +732,6 @@ function removePeca(i){
 }
 
 /* ── RENDER PROG ── */
-function tipoPrev(hor,proj){
-  const iv=cfg.int;
-  for(let k=3;k>=0;k--){
-    if(Math.floor(proj/iv[k])>Math.floor(hor/iv[k]))return k;
-  }
-  return -1;
-}
 function custosPrev(){
   const t=totaisPecas();
   return t.map((v,i)=>v+cfg.mo[i]);
@@ -616,21 +741,34 @@ function renderProg(){
   const cp=custosPrev();
   let total=0;
 
+  // opções do select: -1 = sem preventiva, 0-3 = índices dos tipos
+  function buildOptions(sel){
+    const opts=[
+      {v:-1, lbl:'— Sem preventiva'},
+      {v:0,  lbl: LABELS[0]},
+      {v:1,  lbl: LABELS[1]},
+      {v:2,  lbl: LABELS[2]},
+      {v:3,  lbl: LABELS[3]},
+    ];
+    return opts.map(o=>`<option value="${o.v}"${sel===o.v?' selected':''}>${o.lbl}</option>`).join('');
+  }
+
   $id('tbody-prog').innerHTML=emps.map((e,i)=>{
     const hor=e.hor||0,med=e.med||0;
     const proj=hor+med;
-    const tipo=tipoPrev(hor,proj);
+    const tipo=e.tipo!==undefined?e.tipo:-1;
     const custo=tipo>=0?cp[tipo]:0;
     if(tipo>=0)total+=custo;
-    const badge=tipo>=0
-      ?`<span class="badge ${BCLS[tipo]}">${LABELS[tipo]}</span>`
-      :`<span class="badge bnone">Sem preventiva</span>`;
     return `<div class="parts-row prog-cols">
       <input type="text" value="${esc(e.nome)}" onchange="emps[${i}].nome=this.value;persist()">
       <input type="number" value="${hor||''}" min="0" placeholder="0" onchange="emps[${i}].hor=parseInt(this.value)||0;saveAll()" style="text-align:center">
       <input type="number" value="${med||''}" min="0" placeholder="0" onchange="emps[${i}].med=parseInt(this.value)||0;saveAll()" style="text-align:center">
       <div class="ccell-r">${proj>0?proj.toLocaleString('pt-BR'):'—'}</div>
-      <div class="ccell-c">${badge}</div>
+      <div class="ccell-c" style="padding:0">
+        <select class="prev-select" onchange="emps[${i}].tipo=parseInt(this.value);saveAll()">
+          ${buildOptions(tipo)}
+        </select>
+      </div>
       <div class="ccell-r">${tipo>=0?brl(custo):'—'}</div>
       <div class="del-cell"><button class="del-btn" onclick="removeEmp(${i})" title="Remover">×</button></div>
     </div>`;
