@@ -230,7 +230,7 @@
 <div class="actions-bar">
   <button class="btn btn-ghost" onclick="limparForm()">Limpar</button>
   <button class="btn btn-ghost" onclick="window.print()">Imprimir</button>
-  <button class="btn btn-ghost" onclick="reabrirOS()" id="btnReabrir" style="display:none">🔄 Reabrir OS</button>
+  <button class="btn btn-ghost" onclick="reabrirOS()" id="btnReabrir">🔄 Reabrir OS</button>
   <button class="btn btn-primary" onclick="compartilhar()">📤 Enviar</button>
 </div>
 
@@ -814,24 +814,24 @@
 
   // ===== REABRIR OS ENVIADA (modo admin) =====
   function reabrirOS() {
-    const binId = localStorage.getItem('lastBinId');
-    const numOS = localStorage.getItem('lastNumOS') || '';
-    if (!binId) { showToast('Nenhuma OS enviada recentemente.'); return; }
-    const adminLink = window.location.origin + window.location.pathname + '?os=' + binId + '&admin=1';
-    window.open(adminLink, '_blank');
-  }
+    // Tenta pegar do localStorage primeiro, senão pede manualmente
+    const salvo = localStorage.getItem('lastBinId');
+    const entrada = prompt(
+      '🔄 Reabrir OS em modo admin\n\nCole o link completo da OS ou apenas o ID:\n(ex: https://...?os=ID  ou somente o ID)',
+      salvo || ''
+    );
+    if (!entrada || !entrada.trim()) return;
 
-  // Mostra botão Reabrir se tiver OS salva no localStorage
-  window.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem('lastBinId')) {
-      const btn = document.getElementById('btnReabrir');
-      if (btn) {
-        const num = localStorage.getItem('lastNumOS');
-        btn.style.display = '';
-        btn.title = 'Reabrir ' + (num || 'última OS') + ' em modo admin';
-      }
-    }
-  });
+    // Extrai o binId do link ou usa direto se for só o ID
+    let binId = entrada.trim();
+    const match = binId.match(/[?&]os=([a-zA-Z0-9]+)/);
+    if (match) binId = match[1];
+
+    if (!binId) { showToast('❌ ID não encontrado no link.'); return; }
+
+    const base = window.location.origin + window.location.pathname;
+    window.open(base + '?os=' + binId + '&admin=1', '_blank');
+  }
 
   // ===== TOAST =====
   function showToast(msg) {
