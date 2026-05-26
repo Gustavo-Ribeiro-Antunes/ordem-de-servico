@@ -230,6 +230,7 @@
 <div class="actions-bar">
   <button class="btn btn-ghost" onclick="limparForm()">Limpar</button>
   <button class="btn btn-ghost" onclick="window.print()">Imprimir</button>
+  <button class="btn btn-ghost" onclick="reabrirOS()" id="btnReabrir" style="display:none">🔄 Reabrir OS</button>
   <button class="btn btn-primary" onclick="compartilhar()">📤 Enviar</button>
 </div>
 
@@ -240,7 +241,10 @@
     Visualização do Cliente — OS somente leitura
     <span>Preencha sua assinatura e confirme seus dados abaixo</span>
   </div>
-  <button class="btn btn-primary" onclick="salvarAssinatura()" style="flex-shrink:0">✍️ Confirmar Assinatura</button>
+  <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap">
+    <button class="btn btn-ghost" onclick="window.print()" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.4)">🖨️ Imprimir / PDF</button>
+    <button class="btn btn-primary" onclick="salvarAssinatura()">✍️ Confirmar Assinatura</button>
+  </div>
 </div>
 
 <div class="form-container">
@@ -640,17 +644,46 @@
 
   // ===== CARREGAR DA URL =====
   let _binIdAtual = null; // guarda o ID do bin para o cliente salvar de volta
+  const ADMIN_SENHA = 'antunes2025'; // senha para acessar modo admin
 
   async function carregarDaURL() {
     const params = new URLSearchParams(window.location.search);
     const binId = params.get('os');
     if (!binId) return;
 
-    // ── MODO CLIENTE: ativa bloqueio de campos ──
     _binIdAtual = binId;
+
+    // ── MODO ADMIN: ?os=ID&admin=1 → pede senha, desbloqueia tudo ──
+    if (params.get('admin') === '1') {
+      const senha = prompt('🔐 Senha de acesso administrativo:');
+      if (senha === ADMIN_SENHA) {
+        // Carrega normalmente sem bloquear
+        try {
+          showToast('🔓 Modo admin — carregando OS...');
+          const res = await fetch(JSONBIN_BASE + '/' + binId + '/latest', {
+            headers: { 'X-Master-Key': JSONBIN_KEY }
+          });
+          if (!res.ok) throw new Error('Não encontrado');
+          const json = await res.json();
+          preencherForm(json.record);
+          showToast('✅ OS carregada em modo admin!');
+          // Salva automaticamente ao sair da página
+          window._adminMode = true;
+          window._adminBinId = binId;
+        } catch(e) {
+          showToast('❌ Erro ao carregar OS.');
+        }
+        return; // NÃO ativa modo cliente
+      } else {
+        alert('❌ Senha incorreta. Acesso negado.');
+        window.location.href = window.location.pathname; // remove params
+        return;
+      }
+    }
+
+    // ── MODO CLIENTE: ativa bloqueio de campos ──
     document.body.classList.add('modo-cliente');
 
-    // Rola até a seção de assinaturas após carregar
     try {
       showToast('Carregando OS...');
       const res = await fetch(JSONBIN_BASE + '/' + binId + '/latest', {
@@ -660,7 +693,6 @@
       const json = await res.json();
       preencherForm(json.record);
       showToast('✅ OS carregada! Preencha sua assinatura abaixo.');
-      // Rola suavemente até a seção de assinaturas
       setTimeout(() => {
         const sigSection = document.querySelector('.sig-box-cliente');
         if (sigSection) sigSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -759,6 +791,9 @@
         link + '\n\n' +
         '📞 47 99248-2740';
 
+      // Guarda o binId localmente para reabrir em modo admin
+      localStorage.setItem('lastBinId', binId);
+      localStorage.setItem('lastNumOS', numOS);
       showToast('✅ OS salva! Abrindo WhatsApp...');
       setTimeout(() => window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank'), 800);
     } catch(e) {
@@ -776,6 +811,27 @@
     document.getElementById('dataOS').valueAsDate = new Date();
     showToast('✅ Formulário limpo!');
   }
+
+  // ===== REABRIR OS ENVIADA (modo admin) =====
+  function reabrirOS() {
+    const binId = localStorage.getItem('lastBinId');
+    const numOS = localStorage.getItem('lastNumOS') || '';
+    if (!binId) { showToast('Nenhuma OS enviada recentemente.'); return; }
+    const adminLink = window.location.origin + window.location.pathname + '?os=' + binId + '&admin=1';
+    window.open(adminLink, '_blank');
+  }
+
+  // Mostra botão Reabrir se tiver OS salva no localStorage
+  window.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('lastBinId')) {
+      const btn = document.getElementById('btnReabrir');
+      if (btn) {
+        const num = localStorage.getItem('lastNumOS');
+        btn.style.display = '';
+        btn.title = 'Reabrir ' + (num || 'última OS') + ' em modo admin';
+      }
+    }
+  });
 
   // ===== TOAST =====
   function showToast(msg) {
