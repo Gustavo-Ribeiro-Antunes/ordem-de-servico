@@ -163,6 +163,50 @@
     .footer-contact { text-align: center; }
   }
 
+  /* ── MODO CLIENTE (campos bloqueados) ── */
+  body.modo-cliente .actions-bar { display: none; }
+  body.modo-cliente .cliente-banner {
+    display: flex !important;
+    background: var(--dark); color: white;
+    padding: 10px 16px; align-items: center; gap: 10px;
+    font-size: 13px; font-weight: 600;
+    position: sticky; top: 68px; z-index: 99;
+    border-bottom: 2px solid var(--red);
+  }
+  .cliente-banner { display: none; }
+  .cliente-banner .banner-icon { font-size: 18px; }
+  .cliente-banner .banner-text { flex: 1; line-height: 1.4; }
+  .cliente-banner .banner-text span { display: block; font-size: 11px; color: #aab; font-weight: 400; }
+
+  body.modo-cliente input:not(.campo-cliente),
+  body.modo-cliente textarea:not(.campo-cliente),
+  body.modo-cliente .add-row-btn,
+  body.modo-cliente button.sig-clear:not(.clear-cliente) {
+    pointer-events: none;
+    background: #f4f6fa !important;
+    color: #555 !important;
+    border-color: #e0e4ee !important;
+    cursor: default !important;
+    user-select: none;
+  }
+  body.modo-cliente .check-item { pointer-events: none; opacity: .75; }
+  body.modo-cliente .campo-cliente {
+    background: #fff !important;
+    border-color: var(--red) !important;
+    color: var(--text) !important;
+    pointer-events: auto !important;
+    cursor: text !important;
+  }
+  body.modo-cliente .sig-box-tecnico canvas,
+  body.modo-cliente .sig-box-tecnico .sig-clear { pointer-events: none; opacity: .6; }
+  body.modo-cliente .sig-box-cliente canvas,
+  body.modo-cliente .sig-box-cliente .sig-clear { pointer-events: auto !important; opacity: 1; }
+  body.modo-cliente .campo-desbloqueado {
+    outline: 2px solid rgba(200,16,46,0.25);
+    outline-offset: 1px;
+    border-radius: 6px;
+  }
+
   @media print {
     .actions-bar, .add-row-btn, .sig-clear, .btn { display: none !important; }
     body { background: white; }
@@ -187,6 +231,16 @@
   <button class="btn btn-ghost" onclick="limparForm()">Limpar</button>
   <button class="btn btn-ghost" onclick="window.print()">Imprimir</button>
   <button class="btn btn-primary" onclick="compartilhar()">📤 Enviar</button>
+</div>
+
+<!-- Banner visível só no modo cliente -->
+<div class="cliente-banner">
+  <span class="banner-icon">🔒</span>
+  <div class="banner-text">
+    Visualização do Cliente — OS somente leitura
+    <span>Preencha sua assinatura e confirme seus dados abaixo</span>
+  </div>
+  <button class="btn btn-primary" onclick="salvarAssinatura()" style="flex-shrink:0">✍️ Confirmar Assinatura</button>
 </div>
 
 <div class="form-container">
@@ -390,18 +444,18 @@
   <div class="card">
     <div class="section-header"><div class="dot"></div> Assinaturas</div>
     <div class="sig-container">
-      <div class="sig-box">
+      <div class="sig-box sig-box-cliente">
         <div class="sig-title">Assinatura do Cliente</div>
         <div class="sig-canvas-wrap">
           <canvas class="sig-pad" id="sigCliente"></canvas>
-          <button class="sig-clear" onclick="clearSig('sigCliente')">Limpar</button>
+          <button class="sig-clear clear-cliente" onclick="clearSig('sigCliente')">Limpar</button>
         </div>
         <div class="sig-fields">
-          <div class="field"><label>Nome</label><input type="text" id="nomeCliente" placeholder="Nome completo"></div>
-          <div class="field"><label>RG / CPF</label><input type="text" id="rgCliente" placeholder="000.000.000-00"></div>
+          <div class="field"><label>Nome</label><input type="text" id="nomeCliente" class="campo-cliente campo-desbloqueado" placeholder="Nome completo"></div>
+          <div class="field"><label>RG / CPF</label><input type="text" id="rgCliente" class="campo-cliente campo-desbloqueado" placeholder="000.000.000-00"></div>
         </div>
       </div>
-      <div class="sig-box">
+      <div class="sig-box sig-box-tecnico">
         <div class="sig-title">Assinatura do Técnico</div>
         <div class="sig-canvas-wrap">
           <canvas class="sig-pad" id="sigTecnico"></canvas>
@@ -585,10 +639,18 @@
   }
 
   // ===== CARREGAR DA URL =====
+  let _binIdAtual = null; // guarda o ID do bin para o cliente salvar de volta
+
   async function carregarDaURL() {
     const params = new URLSearchParams(window.location.search);
     const binId = params.get('os');
     if (!binId) return;
+
+    // ── MODO CLIENTE: ativa bloqueio de campos ──
+    _binIdAtual = binId;
+    document.body.classList.add('modo-cliente');
+
+    // Rola até a seção de assinaturas após carregar
     try {
       showToast('Carregando OS...');
       const res = await fetch(JSONBIN_BASE + '/' + binId + '/latest', {
@@ -597,9 +659,59 @@
       if (!res.ok) throw new Error('Não encontrado');
       const json = await res.json();
       preencherForm(json.record);
-      showToast('✅ OS carregada!');
+      showToast('✅ OS carregada! Preencha sua assinatura abaixo.');
+      // Rola suavemente até a seção de assinaturas
+      setTimeout(() => {
+        const sigSection = document.querySelector('.sig-box-cliente');
+        if (sigSection) sigSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 800);
     } catch(e) {
       showToast('❌ Erro ao carregar OS.');
+    }
+  }
+
+  // ===== SALVAR ASSINATURA (modo cliente) =====
+  async function salvarAssinatura() {
+    const nome = document.getElementById('nomeCliente').value.trim();
+    if (!nome) { showToast('⚠️ Preencha seu nome antes de confirmar.'); return; }
+
+    const canvas = document.getElementById('sigCliente');
+    // Verifica se o canvas está vazio (todos os pixels transparentes)
+    const ctx = canvas.getContext('2d');
+    const pixel = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    const vazio = !pixel.some((v, i) => i % 4 !== 3 && v !== 0); // verifica canais RGB
+    if (vazio) { showToast('⚠️ Por favor, assine no campo de assinatura.'); return; }
+
+    if (!_binIdAtual) { showToast('❌ ID da OS não encontrado.'); return; }
+
+    showToast('💾 Salvando assinatura...');
+    try {
+      // Busca os dados atuais do bin
+      const res = await fetch(JSONBIN_BASE + '/' + _binIdAtual + '/latest', {
+        headers: { 'X-Master-Key': JSONBIN_KEY }
+      });
+      if (!res.ok) throw new Error();
+      const json = await res.json();
+      const dadosAtuais = json.record;
+
+      // Atualiza apenas os campos do cliente
+      dadosAtuais.nomeCliente = document.getElementById('nomeCliente').value;
+      dadosAtuais.rgCliente   = document.getElementById('rgCliente').value;
+      dadosAtuais._sigCliente = document.getElementById('sigCliente').toDataURL();
+      dadosAtuais._assinadoEm = new Date().toLocaleString('pt-BR');
+
+      const put = await fetch(JSONBIN_BASE + '/' + _binIdAtual, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': JSONBIN_KEY
+        },
+        body: JSON.stringify(dadosAtuais)
+      });
+      if (!put.ok) throw new Error();
+      showToast('✅ Assinatura confirmada! Obrigado.');
+    } catch(e) {
+      showToast('❌ Erro ao salvar assinatura. Tente novamente.');
     }
   }
 
