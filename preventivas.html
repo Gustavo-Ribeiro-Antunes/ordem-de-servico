@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Plano de Preventivas – Antunes Lift Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #C8102E;
+  --dark: #1a1a2e;
+  --darker: #0f0f1a;
+  --mid: #2a2a40;
+  --light-bg: #f4f6fa;
+  --border: #d0d5e8;
+  --text: #1e1e2e;
+  --muted: #6b7280;
+  --white: #ffffff;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Barlow', sans-serif; background: var(--light-bg); color: var(--text); min-height: 100vh; padding-bottom: 60px; }
+
+/* ── HEADER ── */
+.header { background: var(--dark); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,.4); }
+.header-logo { display: flex; align-items: center; gap: 10px; }
+.logo-box { background: var(--red); width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; color: white; font-size: 18px; }
+.logo-text strong { display: block; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: 1px; color: white; }
+.logo-text span { font-size: 10px; color: #aab; letter-spacing: 2px; text-transform: uppercase; }
+.header-title { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 800; color: white; letter-spacing: 1px; text-transform: uppercase; }
+
+/* ── ACTIONS BAR ── */
+.actions-bar { background: var(--red); padding: 10px 16px; display: flex; gap: 8px; justify-content: flex-end; position: sticky; top: 68px; z-index: 99; flex-wrap: wrap; }
+.btn { padding: 9px 18px; border-radius: 6px; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 13px; border: none; cursor: pointer; transition: all .15s; letter-spacing: .5px; text-transform: uppercase; }
+.btn-primary { background: white; color: var(--red); }
+.btn-primary:active { background: #ffe0e4; }
+.btn-ghost { background: rgba(255,255,255,.15); color: white; border: 1px solid rgba(255,255,255,.4); }
+.btn-ghost:hover { background: rgba(255,255,255,.25); }
+
+/* ── TABS ── */
+.tab-bar { background: white; display: flex; border-bottom: 2px solid var(--border); position: sticky; top: 116px; z-index: 98; overflow-x: auto; box-shadow: 0 2px 6px rgba(0,0,0,.06); }
+.tab { flex: 1; min-width: 150px; padding: 13px 16px; background: none; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; cursor: pointer; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); transition: color .15s; white-space: nowrap; text-align: center; }
+.tab:hover { color: var(--dark); }
+.tab.active { color: var(--red); border-bottom-color: var(--red); }
+
+/* ── CONTAINER ── */
+.main { max-width: 980px; margin: 20px auto; padding: 0 14px; display: flex; flex-direction: column; gap: 16px; }
+.page { display: none; flex-direction: column; gap: 16px; }
+.page.active { display: flex; }
+
+/* ── CARDS ── */
+.card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.07); border: 1px solid var(--border); }
+.section-header { background: var(--dark); color: white; padding: 11px 16px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between; }
+.sh-left { display: flex; align-items: center; gap: 8px; }
+.dot { width: 6px; height: 6px; background: var(--red); border-radius: 50%; flex-shrink: 0; }
+.sh-btn { background: rgba(255,255,255,.15); color: white; border: 1px solid rgba(255,255,255,.35); border-radius: 5px; padding: 5px 13px; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; text-transform: uppercase; letter-spacing: .5px; }
+.sh-btn:hover { background: rgba(255,255,255,.28); }
+.sh-btn-red { background: var(--red); border-color: #a00; }
+.sh-btn-red:hover { background: #a80d24; }
+
+/* ── TABLE PARTS STYLE ── */
+.tbl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.parts-header { display: grid; padding: 8px 12px; background: #f0f2f8; border-bottom: 1px solid var(--border); }
+.parts-header span { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+.parts-row { display: grid; border-bottom: 1px solid var(--border); }
+
+/* COLUNAS: peças */
+.pecas-cols { grid-template-columns: 78px 1fr 58px 96px 68px 68px 68px 68px 38px; }
+/* COLUNAS: empilhadeiras */
+.prog-cols { grid-template-columns: 1fr 108px 108px 108px 158px 120px 38px; }
+/* COLUNAS: hora */
+.hora-cols { grid-template-columns: 1fr 90px 130px 130px 130px 130px; }
+
+.parts-row input[type="text"],
+.parts-row input[type="number"] {
+  border: none; border-right: 1px solid var(--border); padding: 9px 10px;
+  font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--text);
+  background: white; outline: none; width: 100%; height: 100%;
+}
+.parts-row input[type="number"] { text-align: right; }
+.parts-row input:focus { background: #fff8f8; }
+.parts-row input:last-of-type { border-right: none; }
+
+/* células calculadas */
+.ccell { border-right: 1px solid var(--border); padding: 9px 10px; display: flex; align-items: center; font-size: 14px; }
+.ccell-r { border-right: 1px solid var(--border); padding: 9px 12px; display: flex; align-items: center; justify-content: flex-end; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; }
+.ccell-c { border-right: 1px solid var(--border); padding: 8px 10px; display: flex; align-items: center; justify-content: center; }
+.del-cell { display: flex; align-items: center; justify-content: center; }
+.del-btn { background: none; border: none; color: #ccc; cursor: pointer; font-size: 20px; padding: 4px 8px; font-weight: 700; line-height: 1; transition: color .15s; }
+.del-btn:hover { color: var(--red); }
+
+/* ── BADGES ── */
+.badge { display: inline-block; padding: 3px 9px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+.b250 { background: #eff6ff; color: #1e40af; }
+.b500 { background: #f0fdf4; color: #166534; }
+.b1000 { background: #fffbeb; color: #92400e; }
+.b2000 { background: #fef2f2; color: #991b1b; }
+.bnone { background: #f0f2f8; color: var(--muted); }
+
+/* ── ADD ROW BTN ── */
+.add-row-btn { width: 100%; padding: 10px; background: none; border: none; color: var(--red); font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; letter-spacing: .5px; text-transform: uppercase; border-top: 1px solid var(--border); transition: background .15s; }
+.add-row-btn:hover { background: #fff5f6; }
+
+/* ── FOOTER TOTALS ── */
+.parts-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 11px 16px; background: #f9fafb; border-top: 1px solid var(--border); }
+.parts-footer-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+.parts-footer-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.total-dark { background: var(--dark); }
+.total-footer { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; }
+.total-footer .tf-label { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; color: #aab; text-transform: uppercase; letter-spacing: 1px; }
+.total-footer .tf-val { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 800; color: white; }
+
+/* ── GRID TOTAIS (custo por preventiva) ── */
+.totals-grid { display: grid; grid-template-columns: repeat(4,1fr); }
+.tot-item { padding: 15px 16px; border-right: 1px solid var(--border); }
+.tot-item:last-child { background: var(--darker); border-right: none; }
+.tot-item label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; display: block; margin-bottom: 5px; }
+.tot-item:last-child label { color: #8899bb; }
+.tot-item .tv { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; color: var(--dark); }
+.tot-item:last-child .tv { color: white; font-size: 22px; }
+.tot-item .ts { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.tot-item:last-child .ts { color: #7788aa; }
+
+/* ── MÃO DE OBRA / INTERVALOS GRID ── */
+.cfg-grid { display: grid; grid-template-columns: repeat(4,1fr); }
+.cfg-item { padding: 13px 16px; border-right: 1px solid var(--border); }
+.cfg-item:last-child { border-right: none; }
+.cfg-item label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; display: block; margin-bottom: 7px; }
+.cfg-item input { width: 100%; padding: 9px 10px; border: 1.5px solid var(--border); border-radius: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; color: var(--dark); outline: none; background: white; transition: border-color .15s; }
+.cfg-item input:focus { border-color: var(--red); }
+
+/* ── MODAL ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(10,10,20,.75); z-index: 200; display: none; align-items: flex-start; justify-content: center; padding: 30px 12px 40px; overflow-y: auto; }
+.modal-overlay.open { display: flex; }
+.modal { background: white; border-radius: 12px; width: 100%; max-width: 540px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.45); }
+.modal-hd { background: var(--dark); color: white; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
+.modal-hd h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+.modal-close { background: none; border: none; color: rgba(255,255,255,.6); font-size: 24px; cursor: pointer; line-height: 1; padding: 2px 8px; }
+.modal-close:hover { color: white; }
+.modal-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.modal-ft { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; align-items: center; }
+
+.fg { display: flex; flex-direction: column; gap: 5px; }
+.fg label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+.fg input, .fg select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 6px; font-family: 'Barlow', sans-serif; font-size: 15px; color: var(--text); background: white; outline: none; transition: border-color .15s; width: 100%; }
+.fg input:focus, .fg select:focus { border-color: var(--red); }
+.r2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.r4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+.qtd-box { background: #f4f6fa; border-radius: 8px; padding: 14px; }
+.qtd-box-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 10px; }
+
+.preview-box { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.preview-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; border-bottom: 1px solid var(--border); }
+.preview-row:last-child { border-bottom: none; }
+.preview-lbl { font-size: 13px; color: var(--text); }
+.preview-val { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; color: var(--dark); }
+.preview-zero { color: #bbb; }
+
+.mbtn { padding: 10px 22px; border-radius: 6px; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 14px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: .5px; }
+.mbtn-ok { background: var(--red); color: white; }
+.mbtn-ok:hover { background: #a80d24; }
+.mbtn-cancel { background: #f0f2f8; color: var(--muted); }
+.mbtn-cancel:hover { background: #e0e4ee; }
+.form-err { font-size: 13px; color: var(--red); font-weight: 600; margin-right: auto; }
+
+/* ── HORA NOTE ── */
+.nota { padding: 14px 18px; font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--dark); color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; box-shadow: 0 4px 20px rgba(0,0,0,.35); z-index: 999; opacity: 0; pointer-events: none; transition: opacity .3s; white-space: nowrap; }
+.toast.show { opacity: 1; }
+
+/* ── PRINT ── */
+@media print {
+  .actions-bar, .tab-bar, .del-btn, .add-row-btn, .sh-btn, .modal-overlay { display: none !important; }
+  body { background: white; }
+  .card { box-shadow: none; page-break-inside: avoid; }
+  .header { position: relative; top: 0; }
+}
+
+/* ── MOBILE ── */
+@media (max-width: 620px) {
+  .header { padding: 12px 14px; }
+  .header-title { font-size: 16px; }
+  .actions-bar { top: 60px; }
+  .tab-bar { top: 108px; }
+  .tab { font-size: 13px; min-width: 120px; padding: 11px 12px; }
+  .totals-grid, .cfg-grid { grid-template-columns: 1fr 1fr; }
+  .tot-item, .cfg-item { border-bottom: 1px solid var(--border); }
+  .pecas-cols { min-width: 720px; }
+  .prog-cols { min-width: 700px; }
+  .hora-cols { min-width: 660px; }
+  .r4 { grid-template-columns: 1fr 1fr; }
+  .modal-overlay { padding: 16px 8px; }
+  .modal-ft { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">
+    <div class="logo-box">A</div>
+    <div class="logo-text">
+      <strong>ANTUNES</strong>
+      <span>Lift Solutions</span>
+    </div>
+  </div>
+  <div class="header-title">Plano de Preventivas</div>
+</div>
+
+<!-- ACTIONS BAR -->
+<div class="actions-bar">
+  <button class="btn btn-ghost" onclick="exportCSV()">⬇ Exportar CSV</button>
+  <button class="btn btn-ghost" onclick="window.print()">🖨 Imprimir</button>
+  <button class="btn btn-primary" onclick="openModal()">＋ Nova Peça</button>
+</div>
+
+<!-- TABS -->
+<div class="tab-bar">
+  <button class="tab active" onclick="goTab('pecas',this)">⚙ Peças &amp; Preventivas</button>
+  <button class="tab" onclick="goTab('prog',this)">📅 Programação Mensal</button>
+  <button class="tab" onclick="goTab('hora',this)">⏱ Custo por Hora</button>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════════════════════════════════════════════════
+     ABA 1 — PEÇAS & PREVENTIVAS
+═══════════════════════════════════════════════════════════ -->
+<div id="page-pecas" class="page active">
+
+  <div class="card">
+    <div class="section-header">
+      <div class="sh-left"><div class="dot"></div> Peças Cadastradas</div>
+      <button class="sh-btn sh-btn-red" onclick="openModal()">+ Nova Peça</button>
+    </div>
+    <div class="tbl-scroll">
+      <div class="parts-header pecas-cols">
+        <span>Código</span>
+        <span>Descrição</span>
+        <span>Un.</span>
+        <span style="text-align:right">Preço Unit.</span>
+        <span style="text-align:center">250h</span>
+        <span style="text-align:center">500h</span>
+        <span style="text-align:center">1000h</span>
+        <span style="text-align:center">2000h</span>
+        <span></span>
+      </div>
+      <div id="tbody-pecas"></div>
+    </div>
+    <div id="footer-pecas"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-header">
+      <div class="sh-left"><div class="dot"></div> Mão de Obra por Tipo de Preventiva</div>
+    </div>
+    <div class="cfg-grid">
+      <div class="cfg-item"><label>PREV 250h (R$)</label><input type="number" id="mo-1" min="0" step="0.01" onchange="saveAll()"></div>
+      <div class="cfg-item"><label>PREV 500h (R$)</label><input type="number" id="mo-2" min="0" step="0.01" onchange="saveAll()"></div>
+      <div class="cfg-item"><label>PREV 1000h (R$)</label><input type="number" id="mo-3" min="0" step="0.01" onchange="saveAll()"></div>
+      <div class="cfg-item"><label>PREV 2000h (R$)</label><input type="number" id="mo-4" min="0" step="0.01" onchange="saveAll()"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-header"><div class="sh-left"><div class="dot"></div> Custo Total por Tipo de Preventiva</div></div>
+    <div class="totals-grid">
+      <div class="tot-item">
+        <label>Preventiva 250h</label>
+        <div class="tv" id="tot-250">R$ 0,00</div>
+        <div class="ts" id="ts-250">peças + MO</div>
+      </div>
+      <div class="tot-item">
+        <label>Preventiva 500h</label>
+        <div class="tv" id="tot-500">R$ 0,00</div>
+        <div class="ts" id="ts-500">peças + MO</div>
+      </div>
+      <div class="tot-item">
+        <label>Preventiva 1000h</label>
+        <div class="tv" id="tot-1000">R$ 0,00</div>
+        <div class="ts" id="ts-1000">peças + MO</div>
+      </div>
+      <div class="tot-item">
+        <label>Preventiva 2000h</label>
+        <div class="tv" id="tot-2000">R$ 0,00</div>
+        <div class="ts" id="ts-2000">peças + MO</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page-pecas -->
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     ABA 2 — PROGRAMAÇÃO MENSAL
+═══════════════════════════════════════════════════════════ -->
+<div id="page-prog" class="page">
+
+  <div class="card">
+    <div class="section-header"><div class="sh-left"><div class="dot"></div> Intervalos de Preventiva (horas)</div></div>
+    <div class="cfg-grid">
+      <div class="cfg-item"><label>Preventiva 1</label><input type="number" id="int-1" min="1" onchange="saveAll()"></div>
+      <div class="cfg-item"><label>Preventiva 2</label><input type="number" id="int-2" min="1" onchange="saveAll()"></div>
+      <div class="cfg-item"><label>Preventiva 3</label><input type="number" id="int-3" min="1" onchange="saveAll()"></div>
+      <div class="cfg-item"><label>Preventiva 4</label><input type="number" id="int-4" min="1" onchange="saveAll()"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-header">
+      <div class="sh-left"><div class="dot"></div> Empilhadeiras — Mês Atual</div>
+      <button class="sh-btn" onclick="addEmp()">+ Empilhadeira</button>
+    </div>
+    <div class="tbl-scroll">
+      <div class="parts-header prog-cols">
+        <span>Empilhadeira / Frota</span>
+        <span style="text-align:center">Horímetro (h)</span>
+        <span style="text-align:center">Média h/mês</span>
+        <span style="text-align:center">Proj. fim mês</span>
+        <span style="text-align:center">Tipo Preventiva</span>
+        <span style="text-align:right">Custo (R$)</span>
+        <span></span>
+      </div>
+      <div id="tbody-prog"></div>
+    </div>
+    <div id="footer-prog"></div>
+  </div>
+
+</div><!-- /page-prog -->
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     ABA 3 — CUSTO POR HORA
+═══════════════════════════════════════════════════════════ -->
+<div id="page-hora" class="page">
+
+  <div class="card">
+    <div class="section-header"><div class="sh-left"><div class="dot"></div> Custo de Preventiva por Hora de Máquina</div></div>
+    <div class="tbl-scroll">
+      <div class="parts-header hora-cols">
+        <span>Tipo</span>
+        <span style="text-align:right">Intervalo</span>
+        <span style="text-align:right">Custo Peças</span>
+        <span style="text-align:right">Mão de Obra</span>
+        <span style="text-align:right">Total</span>
+        <span style="text-align:right">R$ / hora</span>
+      </div>
+      <div id="tbody-hora"></div>
+    </div>
+    <div id="footer-hora"></div>
+    <div class="nota" id="nota-hora"></div>
+  </div>
+
+</div><!-- /page-hora -->
+
+</div><!-- /main -->
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODAL — NOVA PEÇA
+═══════════════════════════════════════════════════════════ -->
+<div id="modal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-hd">
+      <h2><div class="dot"></div> Cadastrar Nova Peça</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="r2">
+        <div class="fg">
+          <label>Código</label>
+          <input type="text" id="m-cod" placeholder="ex: P021" oninput="calcPreview()">
+        </div>
+        <div class="fg">
+          <label>Unidade</label>
+          <select id="m-un">
+            <option>UN</option><option>L</option><option>KG</option>
+            <option>JG</option><option>KIT</option><option>M</option><option>PAR</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>Descrição da Peça</label>
+        <input type="text" id="m-desc" placeholder="ex: Filtro separador de água" oninput="calcPreview()">
+      </div>
+
+      <div class="fg">
+        <label>Preço Unitário (R$)</label>
+        <input type="number" id="m-preco" placeholder="0,00" min="0" step="0.01" oninput="calcPreview()">
+      </div>
+
+      <div class="qtd-box">
+        <div class="qtd-box-title">Quantidade por tipo de preventiva</div>
+        <div class="r4">
+          <div class="fg"><label id="lbl-q1">PREV 250h</label><input type="number" id="m-q1" value="0" min="0" oninput="calcPreview()"></div>
+          <div class="fg"><label id="lbl-q2">PREV 500h</label><input type="number" id="m-q2" value="0" min="0" oninput="calcPreview()"></div>
+          <div class="fg"><label id="lbl-q3">PREV 1000h</label><input type="number" id="m-q3" value="0" min="0" oninput="calcPreview()"></div>
+          <div class="fg"><label id="lbl-q4">PREV 2000h</label><input type="number" id="m-q4" value="0" min="0" oninput="calcPreview()"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="qtd-box-title" style="margin-bottom:8px">Custo que esta peça adiciona em cada preventiva</div>
+        <div class="preview-box" id="preview"></div>
+      </div>
+
+    </div>
+    <div class="modal-ft">
+      <span class="form-err" id="form-err"></span>
+      <button class="mbtn mbtn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="mbtn mbtn-ok" onclick="addPeca()">✓ Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const PECAS_KEY = 'als_prev_pecas_v3';
+const CFG_KEY   = 'als_prev_cfg_v3';
+const EMPS_KEY  = 'als_prev_emps_v3';
+
+let pecas = [], emps = [];
+let cfg = { mo: [150, 250, 400, 700], int: [250, 500, 1000, 2000] };
+
+const LABELS = ['Preventiva 250h', 'Preventiva 500h', 'Preventiva 1000h', 'Preventiva 2000h'];
+const BCLS   = ['b250', 'b500', 'b1000', 'b2000'];
+
+const PECAS_DEFAULT = [
+  {cod:'P001',desc:'Óleo motor (litro)',un:'L',preco:35,q1:6,q2:6,q3:6,q4:6},
+  {cod:'P002',desc:'Filtro de óleo motor',un:'UN',preco:45,q1:1,q2:1,q3:1,q4:1},
+  {cod:'P003',desc:'Filtro de ar',un:'UN',preco:80,q1:0,q2:1,q3:1,q4:1},
+  {cod:'P004',desc:'Filtro de combustível',un:'UN',preco:60,q1:0,q2:1,q3:1,q4:1},
+  {cod:'P005',desc:'Filtro hidráulico',un:'UN',preco:120,q1:0,q2:0,q3:1,q4:1},
+  {cod:'P006',desc:'Óleo hidráulico (litro)',un:'L',preco:28,q1:0,q2:0,q3:0,q4:30},
+  {cod:'P007',desc:'Óleo transmissão (litro)',un:'L',preco:40,q1:0,q2:0,q3:0,q4:12},
+  {cod:'P008',desc:'Graxa (kg)',un:'KG',preco:25,q1:1,q2:1,q3:2,q4:2},
+  {cod:'P009',desc:'Vela / bico injetor',un:'UN',preco:90,q1:0,q2:0,q3:4,q4:4},
+  {cod:'P010',desc:'Correia',un:'UN',preco:110,q1:0,q2:0,q3:0,q4:1},
+  {cod:'P011',desc:'Pastilha / lona de freio (jogo)',un:'JG',preco:220,q1:0,q2:0,q3:1,q4:1},
+  {cod:'P012',desc:'Fluido de freio (litro)',un:'L',preco:32,q1:0,q2:0,q3:1,q4:1},
+  {cod:'P013',desc:'Líquido arrefecimento (litro)',un:'L',preco:22,q1:0,q2:0,q3:0,q4:6},
+  {cod:'P014',desc:'Rolamento',un:'UN',preco:150,q1:0,q2:0,q3:0,q4:2},
+  {cod:'P015',desc:'Pneu',un:'UN',preco:850,q1:0,q2:0,q3:0,q4:0},
+  {cod:'P016',desc:'Lâmpada / componente elétrico',un:'UN',preco:35,q1:0,q2:1,q3:1,q4:1},
+  {cod:'P017',desc:'Mangueira hidráulica',un:'UN',preco:130,q1:0,q2:0,q3:0,q4:1},
+  {cod:'P018',desc:'Elemento do respiro',un:'UN',preco:55,q1:0,q2:0,q3:1,q4:1},
+  {cod:'P019',desc:'Material de limpeza / estopa',un:'KIT',preco:40,q1:1,q2:1,q3:1,q4:1},
+  {cod:'P020',desc:'Kit de vedação / retentores',un:'KIT',preco:180,q1:0,q2:0,q3:0,q4:1},
+];
+const EMPS_DEFAULT = [
+  {nome:'Empilhadeira 01',hor:2380,med:180},
+  {nome:'Empilhadeira 02',hor:940,med:160},
+  {nome:'Empilhadeira 03',hor:4720,med:200},
+  {nome:'Empilhadeira 04',hor:240,med:120},
+  {nome:'Empilhadeira 05',hor:1850,med:170},
+];
+
+/* ── UTILS ── */
+function brl(v){return 'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function $id(id){return document.getElementById(id);}
+function showToast(msg){const t=$id('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+/* ── LOAD / SAVE ── */
+function load(){
+  try{const d=localStorage.getItem(PECAS_KEY);if(d)pecas=JSON.parse(d);}catch(e){}
+  if(!pecas.length)pecas=PECAS_DEFAULT.map(p=>({...p}));
+
+  try{
+    const c=localStorage.getItem(CFG_KEY);
+    if(c){const j=JSON.parse(c);cfg.mo=j.mo||cfg.mo;cfg.int=j.int||cfg.int;}
+  }catch(e){}
+
+  try{const d=localStorage.getItem(EMPS_KEY);if(d)emps=JSON.parse(d);}catch(e){}
+  if(!emps.length)emps=EMPS_DEFAULT.map(e=>({...e}));
+
+  // aplica cfg aos inputs
+  [1,2,3,4].forEach(i=>{
+    const mo=$id('mo-'+i); if(mo) mo.value=cfg.mo[i-1];
+    const iv=$id('int-'+i); if(iv) iv.value=cfg.int[i-1];
+  });
+  renderAll();
+}
+
+function readCfg(){
+  cfg.mo=[1,2,3,4].map(i=>parseFloat($id('mo-'+i)?.value)||0);
+  cfg.int=[1,2,3,4].map(i=>parseInt($id('int-'+i)?.value)||250);
+}
+function persist(){
+  try{localStorage.setItem(PECAS_KEY,JSON.stringify(pecas));}catch(e){}
+  try{localStorage.setItem(CFG_KEY,JSON.stringify(cfg));}catch(e){}
+  try{localStorage.setItem(EMPS_KEY,JSON.stringify(emps));}catch(e){}
+}
+function saveAll(){readCfg();persist();renderAll();}
+
+/* ── TABS ── */
+function goTab(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  $id('page-'+id).classList.add('active');
+  if(el)el.classList.add('active');
+}
+
+/* ── MODAL ── */
+function openModal(){
+  readCfg();
+  ['m-cod','m-desc','m-preco'].forEach(id=>$id(id).value='');
+  $id('m-un').value='UN';
+  ['m-q1','m-q2','m-q3','m-q4'].forEach(id=>$id(id).value=0);
+  $id('form-err').textContent='';
+  [1,2,3,4].forEach(i=>$id('lbl-q'+i).textContent='PREV '+cfg.int[i-1]+'h');
+  calcPreview();
+  $id('modal').classList.add('open');
+  setTimeout(()=>$id('m-cod').focus(),80);
+}
+function closeModal(){$id('modal').classList.remove('open');}
+
+function calcPreview(){
+  const preco=parseFloat($id('m-preco').value)||0;
+  const qs=[1,2,3,4].map(i=>parseInt($id('m-q'+i).value)||0);
+  $id('preview').innerHTML=LABELS.map((lbl,i)=>{
+    const v=preco*qs[i];
+    return `<div class="preview-row">
+      <span class="preview-lbl"><span class="badge ${BCLS[i]}">${lbl}</span></span>
+      <span class="preview-val ${v===0?'preview-zero':''}">${brl(v)}</span>
+    </div>`;
+  }).join('');
+}
+
+function addPeca(){
+  const cod=$id('m-cod').value.trim();
+  const desc=$id('m-desc').value.trim();
+  const un=$id('m-un').value;
+  const preco=parseFloat($id('m-preco').value)||0;
+  const q1=parseInt($id('m-q1').value)||0;
+  const q2=parseInt($id('m-q2').value)||0;
+  const q3=parseInt($id('m-q3').value)||0;
+  const q4=parseInt($id('m-q4').value)||0;
+  const err=$id('form-err');
+  if(!cod){err.textContent='Informe o código.';return;}
+  if(!desc){err.textContent='Informe a descrição.';return;}
+  pecas.push({cod,desc,un,preco,q1,q2,q3,q4});
+  saveAll();
+  closeModal();
+  showToast('✅ Peça adicionada com sucesso!');
+}
+
+/* ── RENDER PEÇAS ── */
+function totaisPecas(){
+  const t=[0,0,0,0];
+  pecas.forEach(p=>{t[0]+=p.preco*(p.q1||0);t[1]+=p.preco*(p.q2||0);t[2]+=p.preco*(p.q3||0);t[3]+=p.preco*(p.q4||0);});
+  return t;
+}
+
+function renderPecas(){
+  const t=totaisPecas();
+  const mo=cfg.mo;
+
+  $id('tbody-pecas').innerHTML=pecas.map((p,i)=>`
+    <div class="parts-row pecas-cols">
+      <input type="text" value="${esc(p.cod)}" onchange="pecas[${i}].cod=this.value;persist()" style="font-family:'Barlow Condensed';font-weight:700;font-size:15px">
+      <input type="text" value="${esc(p.desc)}" onchange="pecas[${i}].desc=this.value;persist()">
+      <input type="text" value="${esc(p.un)}" onchange="pecas[${i}].un=this.value;persist()" style="text-align:center">
+      <input type="number" value="${p.preco}" min="0" step="0.01" onchange="pecas[${i}].preco=parseFloat(this.value)||0;saveAll()">
+      <input type="number" value="${p.q1||0}" min="0" onchange="pecas[${i}].q1=parseInt(this.value)||0;saveAll()" style="text-align:center">
+      <input type="number" value="${p.q2||0}" min="0" onchange="pecas[${i}].q2=parseInt(this.value)||0;saveAll()" style="text-align:center">
+      <input type="number" value="${p.q3||0}" min="0" onchange="pecas[${i}].q3=parseInt(this.value)||0;saveAll()" style="text-align:center">
+      <input type="number" value="${p.q4||0}" min="0" onchange="pecas[${i}].q4=parseInt(this.value)||0;saveAll()" style="text-align:center">
+      <div class="del-cell"><button class="del-btn" onclick="removePeca(${i})" title="Remover">×</button></div>
+    </div>`).join('');
+
+  $id('footer-pecas').innerHTML=`
+    <div class="parts-footer">
+      <span class="parts-footer-label">Total em Peças</span>
+      <div class="parts-footer-badges">
+        <span class="badge b250">250h: ${brl(t[0])}</span>
+        <span class="badge b500">500h: ${brl(t[1])}</span>
+        <span class="badge b1000">1000h: ${brl(t[2])}</span>
+        <span class="badge b2000">2000h: ${brl(t[3])}</span>
+      </div>
+    </div>`;
+
+  // cards de total
+  [0,1,2,3].forEach(i=>{
+    const sfx=['250','500','1000','2000'][i];
+    const tot=t[i]+mo[i];
+    $id('tot-'+sfx).textContent=brl(tot);
+    $id('ts-'+sfx).textContent='peças '+brl(t[i])+' + MO '+brl(mo[i]);
+  });
+}
+
+function removePeca(i){
+  if(!confirm('Remover "'+pecas[i].desc+'"?'))return;
+  pecas.splice(i,1);saveAll();showToast('Peça removida.');
+}
+
+/* ── RENDER PROG ── */
+function tipoPrev(hor,proj){
+  const iv=cfg.int;
+  for(let k=3;k>=0;k--){
+    if(Math.floor(proj/iv[k])>Math.floor(hor/iv[k]))return k;
+  }
+  return -1;
+}
+function custosPrev(){
+  const t=totaisPecas();
+  return t.map((v,i)=>v+cfg.mo[i]);
+}
+
+function renderProg(){
+  const cp=custosPrev();
+  let total=0;
+
+  $id('tbody-prog').innerHTML=emps.map((e,i)=>{
+    const hor=e.hor||0,med=e.med||0;
+    const proj=hor+med;
+    const tipo=tipoPrev(hor,proj);
+    const custo=tipo>=0?cp[tipo]:0;
+    if(tipo>=0)total+=custo;
+    const badge=tipo>=0
+      ?`<span class="badge ${BCLS[tipo]}">${LABELS[tipo]}</span>`
+      :`<span class="badge bnone">Sem preventiva</span>`;
+    return `<div class="parts-row prog-cols">
+      <input type="text" value="${esc(e.nome)}" onchange="emps[${i}].nome=this.value;persist()">
+      <input type="number" value="${hor||''}" min="0" placeholder="0" onchange="emps[${i}].hor=parseInt(this.value)||0;saveAll()" style="text-align:center">
+      <input type="number" value="${med||''}" min="0" placeholder="0" onchange="emps[${i}].med=parseInt(this.value)||0;saveAll()" style="text-align:center">
+      <div class="ccell-r">${proj>0?proj.toLocaleString('pt-BR'):'—'}</div>
+      <div class="ccell-c">${badge}</div>
+      <div class="ccell-r">${tipo>=0?brl(custo):'—'}</div>
+      <div class="del-cell"><button class="del-btn" onclick="removeEmp(${i})" title="Remover">×</button></div>
+    </div>`;
+  }).join('');
+
+  $id('footer-prog').innerHTML=`
+    <div class="total-dark">
+      <div class="total-footer">
+        <span class="tf-label">Total do Mês</span>
+        <span class="tf-val">${brl(total)}</span>
+      </div>
+    </div>`;
+}
+
+function addEmp(){
+  emps.push({nome:'Nova empilhadeira',hor:0,med:0});
+  saveAll();showToast('Empilhadeira adicionada!');
+}
+function removeEmp(i){
+  if(!confirm('Remover "'+emps[i].nome+'"?'))return;
+  emps.splice(i,1);saveAll();
+}
+
+/* ── RENDER HORA ── */
+function renderHora(){
+  const tp=totaisPecas();
+  const mo=cfg.mo;
+  const iv=cfg.int;
+  let tph=0;
+
+  $id('tbody-hora').innerHTML=LABELS.map((lbl,i)=>{
+    const tot=tp[i]+mo[i];
+    const ph=iv[i]>0?tot/iv[i]:0;
+    tph+=ph;
+    return `<div class="parts-row hora-cols">
+      <div class="ccell"><span class="badge ${BCLS[i]}">${lbl}</span></div>
+      <div class="ccell-r" style="border-right:1px solid var(--border)">${iv[i].toLocaleString('pt-BR')} h</div>
+      <div class="ccell-r" style="border-right:1px solid var(--border)">${brl(tp[i])}</div>
+      <div class="ccell-r" style="border-right:1px solid var(--border)">${brl(mo[i])}</div>
+      <div class="ccell-r" style="border-right:1px solid var(--border)">${brl(tot)}</div>
+      <div class="ccell-r">${brl(ph)}/h</div>
+    </div>`;
+  }).join('');
+
+  const maxInt=Math.max(...iv);
+  $id('footer-hora').innerHTML=`
+    <div class="total-dark">
+      <div class="total-footer">
+        <span class="tf-label">Custo preventivo / hora — ciclo ${maxInt.toLocaleString('pt-BR')}h</span>
+        <span class="tf-val">${brl(tph)}/h</span>
+      </div>
+    </div>`;
+  $id('nota-hora').textContent=
+    'Cada linha mostra o custo da preventiva diluído pelo intervalo de horas — quanto custa cada hora trabalhada considerando só aquele tipo de manutenção. '
+    +'O total representa o custo preventivo acumulado por hora ao longo de um ciclo completo de '+maxInt.toLocaleString('pt-BR')+'h.';
+}
+
+/* ── EXPORT CSV ── */
+function exportCSV(){
+  const rows=[['Código','Descrição','Unidade','Preço Unit.','Qtd 250h','Qtd 500h','Qtd 1000h','Qtd 2000h','Custo 250h','Custo 500h','Custo 1000h','Custo 2000h']];
+  pecas.forEach(p=>rows.push([
+    p.cod,p.desc,p.un,p.preco.toFixed(2),
+    p.q1||0,p.q2||0,p.q3||0,p.q4||0,
+    (p.preco*(p.q1||0)).toFixed(2),(p.preco*(p.q2||0)).toFixed(2),
+    (p.preco*(p.q3||0)).toFixed(2),(p.preco*(p.q4||0)).toFixed(2)
+  ]));
+  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='plano-preventivas-als.csv';
+  a.click();
+  showToast('✅ CSV exportado!');
+}
+
+/* ── RENDER ALL ── */
+function renderAll(){renderPecas();renderProg();renderHora();}
+
+/* ── INIT ── */
+window.addEventListener('DOMContentLoaded',load);
+</script>
+</body>
+</html>
