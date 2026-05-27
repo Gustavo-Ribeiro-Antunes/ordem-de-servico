@@ -675,6 +675,7 @@
     // Restaura assinaturas
     if (dados._sigCliente) restaurarAssinatura('sigCliente', dados._sigCliente);
     if (dados._sigTecnico) restaurarAssinatura('sigTecnico', dados._sigTecnico);
+    if (dados._fotos && dados._fotos.length) { _fotos = dados._fotos; renderFotos(); }
     if (dados._fotos) { _fotos = dados._fotos; renderFotos(); }
   }
 
