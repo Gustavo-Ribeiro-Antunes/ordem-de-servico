@@ -711,7 +711,7 @@
     d._sigTecnico = document.getElementById('sigTecnico').toDataURL();
     d._sigCliente = document.getElementById('sigCliente').toDataURL();
     _fotos_col = _fotos;
-    d._fotos = _fotos;
+    d._fotos = _fotos.filter(f => !f.uploading && !f.erro).map(f => ({url:f.url,thumb:f.thumb,del:f.del}));
     return d;
   }
 
@@ -799,10 +799,7 @@
     }
     if (d._sigTecnico) restoreSig('sigTecnico', d._sigTecnico);
     if (d._sigCliente) restoreSig('sigCliente', d._sigCliente);
-    if (d._fotos && d._fotos.length) {
-      _fotos = d._fotos.map(f => typeof f === 'string' ? {url:f, thumb:f} : f);
-      renderFotos();
-    }
+    if (d._fotos && d._fotos.length) { _fotos = d._fotos.map(f => typeof f==='string'?{url:f,thumb:f}:f); renderFotos(); }
     atualizarValidade(); calcTotal();
   }
 
@@ -896,77 +893,82 @@
 
 
   
-  // ===== FOTOS (ImgBB) =====
-  // Cole sua API key do imgbb.com abaixo:
+  
+  // ===== FOTOS (ImgBB — preview local imediato + upload em background) =====
   const IMGBB_KEY = 'a7f6148cbc555ec9ec6a5e755caa7a05';
-
-  let _fotos = [];   // array de { url, thumb, deleteUrl }
+  let _fotos = [];   // { url, thumb, del, localUrl?, uploading?, erro? }
   let _fotoIdx = 0;
 
   async function addFotos(files) {
     const MAX = 10;
     const restantes = MAX - _fotos.length;
-    if (restantes <= 0) { showToast('⚠️ Limite de ' + MAX + ' fotos atingido.'); return; }
+    if (restantes <= 0) { showToast('⚠️ Limite de ' + MAX + ' fotos.'); return; }
     const lista = Array.from(files).slice(0, restantes);
     document.getElementById('fotoInput').value = '';
-    let ok = 0, fail = 0;
 
-    for (let i = 0; i < lista.length; i++) {
-      showToast('📤 Enviando foto ' + (i+1) + ' de ' + lista.length + '...');
+    // 1. Preview local IMEDIATO (sem esperar upload)
+    const startIdx = _fotos.length;
+    for (const file of lista) {
+      const localUrl = URL.createObjectURL(file);
+      _fotos.push({ url: localUrl, thumb: localUrl, uploading: true, _file: file });
+    }
+    renderFotos();
+    showToast('📤 Enviando ' + lista.length + ' foto(s)...');
+
+    // 2. Upload em background para ImgBB
+    let ok = 0, fail = 0;
+    for (let i = startIdx; i < _fotos.length; i++) {
+      const foto = _fotos[i];
+      if (!foto._file) continue;
       try {
-        // Comprime antes de enviar — essencial no mobile (fotos de câmera são muito grandes)
-        const blob = await comprimirBlob(lista[i], 1600, 0.82);
+        const blob = await comprimirBlob(foto._file, 1600, 0.82);
         const fd = new FormData();
         fd.append('image', blob, 'foto.jpg');
-        const res = await fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_KEY, {
-          method: 'POST',
-          body: fd
-        });
+        const res = await fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_KEY, { method:'POST', body:fd });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const json = await res.json();
-        if (!json.success) throw new Error(json.error?.message || 'Falha ImgBB');
-        _fotos.push({
+        if (!json.success) throw new Error(json.error?.message || 'Resposta inválida');
+        URL.revokeObjectURL(foto.url);
+        _fotos[i] = {
           url:   json.data.url,
           thumb: json.data.thumb?.url || json.data.display_url || json.data.url,
           del:   json.data.delete_url
-        });
+        };
         ok++;
-        renderFotos();
       } catch(e) {
+        _fotos[i].uploading = false;
+        _fotos[i].erro = true;
+        delete _fotos[i]._file;
         fail++;
-        console.error('ImgBB foto ' + (i+1) + ':', e);
-        showToast('❌ Foto ' + (i+1) + ' falhou: ' + e.message);
-        await new Promise(r => setTimeout(r, 1800));
+        console.error('ImgBB foto ' + i + ':', e);
       }
+      renderFotos();
     }
-    if (ok > 0) showToast('✅ ' + ok + ' foto(s) enviada(s)!' + (fail ? ' | ' + fail + ' falhou' : ''));
+
+    if (ok > 0 && fail === 0) showToast('✅ ' + ok + ' foto(s) salva(s)!');
+    else if (ok > 0)          showToast('✅ ' + ok + ' salva(s) | ❌ ' + fail + ' falhou');
+    else                      showToast('❌ Falha no upload. Verifique a conexão e tente novamente.');
   }
 
-  // Redimensiona e converte para Blob — funciona em desktop e mobile
+  // Comprime usando canvas + createObjectURL (eficiente no mobile)
   function comprimirBlob(file, maxDim, quality) {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onerror = () => reject(new Error('Leitura falhou'));
-      reader.onload = e => {
-        const img = new Image();
-        img.onerror = () => reject(new Error('Imagem inválida'));
-        img.onload = () => {
-          let w = img.width, h = img.height;
-          if (w > maxDim || h > maxDim) {
-            if (w >= h) { h = Math.round(h * maxDim / w); w = maxDim; }
-            else        { w = Math.round(w * maxDim / h); h = maxDim; }
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = w; canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          canvas.toBlob(blob => {
-            if (blob) resolve(blob);
-            else reject(new Error('Compressão falhou'));
-          }, 'image/jpeg', quality);
-        };
-        img.src = e.target.result;
+      const objUrl = URL.createObjectURL(file);
+      const img = new Image();
+      img.onerror = () => { URL.revokeObjectURL(objUrl); reject(new Error('Imagem inválida')); };
+      img.onload = () => {
+        URL.revokeObjectURL(objUrl);
+        let w = img.width, h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w >= h) { h = Math.round(h * maxDim / w); w = maxDim; }
+          else        { w = Math.round(w * maxDim / h); h = maxDim; }
+        }
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        c.toBlob(blob => blob ? resolve(blob) : reject(new Error('toBlob falhou')), 'image/jpeg', quality);
       };
-      reader.readAsDataURL(file);
+      img.src = objUrl;
     });
   }
 
@@ -980,23 +982,26 @@
       return;
     }
     if (vazia) vazia.style.display = 'none';
-    grid.innerHTML = _fotos.map((f, i) =>
-      `<div class="foto-thumb" onclick="abrirFoto(${i})">
+    grid.innerHTML = _fotos.map((f, i) => `
+      <div class="foto-thumb" onclick="${f.uploading||f.erro ? '' : 'abrirFoto('+i+')'}">
         <img src="${f.thumb || f.url}" alt="Foto ${i+1}" loading="lazy">
+        ${f.uploading ? '<div class="foto-uploading">⏳</div>' : ''}
+        ${f.erro      ? '<div class="foto-erro-mark">❌</div>' : ''}
         <button class="foto-del" onclick="event.stopPropagation();removeFoto(${i})">✕</button>
-      </div>`
-    ).join('');
+      </div>`).join('');
   }
 
   function removeFoto(i) {
     if (!confirm('Remover esta foto?')) return;
+    if (_fotos[i]?.url?.startsWith('blob:')) URL.revokeObjectURL(_fotos[i].url);
     _fotos.splice(i, 1);
     renderFotos();
   }
 
   function abrirFoto(i) {
+    if (_fotos[i]?.uploading || _fotos[i]?.erro) return;
     _fotoIdx = i;
-    const lb = document.getElementById('fotoLightbox');
+    const lb  = document.getElementById('fotoLightbox');
     const img = document.getElementById('fotoLbImg');
     if (!lb || !img) return;
     img.src = _fotos[i].url;
@@ -1011,13 +1016,11 @@
     abrirFoto(_fotoIdx);
   }
 
-  function fecharFoto() {
-    document.getElementById('fotoLightbox').classList.remove('open');
-  }
+  function fecharFoto() { document.getElementById('fotoLightbox').classList.remove('open'); }
 
   document.addEventListener('keydown', e => {
     const lb = document.getElementById('fotoLightbox');
-    if (!lb || !lb.classList.contains('open')) return;
+    if (!lb?.classList.contains('open')) return;
     if (e.key === 'Escape') fecharFoto();
     if (e.key === 'ArrowLeft') navFoto(-1);
     if (e.key === 'ArrowRight') navFoto(1);
@@ -1025,6 +1028,8 @@
   document.getElementById('fotoLightbox')?.addEventListener('click', function(e) {
     if (e.target === this) fecharFoto();
   });
+
+
 
 
   // TOAST
