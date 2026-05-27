@@ -635,9 +635,9 @@
     // Salva assinaturas como imagem base64
     dados._sigCliente = document.getElementById('sigCliente').toDataURL();
     dados._sigTecnico = document.getElementById('sigTecnico').toDataURL();
+    dados._fotos = _fotos;
 
     return dados;
-    dados._fotos = _fotos;
   }
 
   function restaurarAssinatura(canvasId, dataURL) {
