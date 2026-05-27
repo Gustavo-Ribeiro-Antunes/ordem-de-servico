@@ -155,6 +155,62 @@
     body { background: white; }
     .card { box-shadow: none; }
   }
+
+  /* ===== MODO CLIENTE ===== */
+  .cliente-banner { display:none; background:var(--dark); color:white; padding:14px 20px; border-radius:10px; margin-bottom:4px; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  body.modo-cliente .cliente-banner { display:flex; }
+  .cliente-banner-info strong { display:block; font-family:'Barlow Condensed',sans-serif; font-size:17px; font-weight:800; letter-spacing:1px; }
+  .cliente-banner-info span { font-size:12px; color:#aab; }
+  .btn-confirmar { display:none; background:white; color:var(--red); }
+  body.modo-cliente .btn-confirmar { display:inline-block; }
+  body.modo-cliente .btn-limpar,
+  body.modo-cliente .btn-enviar,
+  body.modo-cliente .btn-reabrir { display:none; }
+
+  /* Bloqueia todos os campos no modo cliente */
+  body.modo-cliente input:not(.campo-desbloqueado),
+  body.modo-cliente textarea:not(.campo-desbloqueado),
+  body.modo-cliente select:not(.campo-desbloqueado) {
+    pointer-events:none !important; background:#f4f6fa !important;
+    color:#9ca3af !important; border-color:#e5e7eb !important; cursor:default !important;
+  }
+  body.modo-cliente .add-row-btn,
+  body.modo-cliente .del-btn,
+  body.modo-cliente .sig-clear { display:none !important; }
+  body.modo-cliente canvas#sigTecnico { pointer-events:none !important; cursor:default !important; }
+  /* Canvas do cliente: mantém interativo */
+  body.modo-cliente canvas#sigCliente { pointer-events:auto !important; cursor:crosshair !important; }
+  body.modo-cliente .clear-cliente { display:flex !important; }
+
+  /* Aceite liberado para cliente */
+  body.modo-cliente .aceite-btn { pointer-events:auto !important; cursor:pointer !important; }
+  body.modo-cliente #obsAceiteWrap textarea,
+  body.modo-cliente #obsAceiteWrap input,
+  body.modo-cliente #dataAceiteWrap input { pointer-events:auto !important; background:white !important; color:var(--text) !important; border-color:var(--border) !important; }
+
+  /* ===== FOTOS ===== */
+  .fotos-grid { display:flex; flex-wrap:wrap; gap:10px; padding:14px 16px; min-height:72px; align-items:flex-start; }
+  .foto-thumb { position:relative; width:88px; height:88px; border-radius:8px; overflow:hidden; border:1.5px solid var(--border); cursor:pointer; flex-shrink:0; }
+  .foto-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+  .foto-del { position:absolute; top:4px; right:4px; background:rgba(200,16,46,.88); color:white; border:none; border-radius:4px; font-size:12px; font-weight:900; cursor:pointer; padding:1px 6px; line-height:1.5; display:none; }
+  .foto-thumb:hover .foto-del { display:block; }
+  .foto-vazia { padding:18px 16px; text-align:center; color:var(--muted); font-size:13px; }
+  .sh-foto-label { background:rgba(255,255,255,.15); color:white; border:1px solid rgba(255,255,255,.4); border-radius:5px; padding:5px 13px; font-family:'Barlow',sans-serif; font-weight:700; font-size:12px; cursor:pointer; text-transform:uppercase; letter-spacing:.5px; margin-left:auto; user-select:none; }
+  .sh-foto-label:hover { background:rgba(255,255,255,.28); }
+  /* Modo cliente: oculta controles de edição de fotos */
+  body.modo-cliente .sh-foto-label { display:none !important; }
+  body.modo-cliente .foto-del { display:none !important; pointer-events:none !important; }
+  /* Lightbox */
+  .foto-lb { position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:500; display:none; align-items:center; justify-content:center; }
+  .foto-lb.open { display:flex; }
+  .foto-lb img { max-width:92vw; max-height:88vh; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.6); }
+  .foto-lb-close { position:absolute; top:14px; right:18px; background:none; border:none; color:rgba(255,255,255,.8); font-size:34px; cursor:pointer; font-weight:700; line-height:1; }
+  .foto-lb-close:hover { color:white; }
+  .foto-nav { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.15); border:none; color:white; font-size:26px; cursor:pointer; padding:10px 14px; border-radius:6px; }
+  .foto-nav:hover { background:rgba(255,255,255,.3); }
+  #fotoNavPrev { left:12px; }
+  #fotoNavNext { right:12px; }
+  .foto-lb-counter { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); color:rgba(255,255,255,.7); font-size:13px; font-weight:600; }
 </style>
 </head>
 <body>
@@ -178,11 +234,23 @@
 </div>
 
 <div class="actions-bar">
-  <button class="btn btn-ghost" onclick="limparForm()">Limpar</button>
+  <button class="btn btn-ghost btn-limpar" onclick="limparForm()">Limpar</button>
   <button class="btn btn-ghost" onclick="window.print()">Imprimir</button>
-  <button class="btn btn-primary" onclick="compartilhar()">📤 Enviar</button>
+  <button class="btn btn-ghost btn-reabrir" onclick="reabrirORC()">🔄 Reabrir</button>
+  <button class="btn btn-primary btn-enviar" onclick="compartilhar()">📤 Enviar</button>
+  <button class="btn btn-confirmar" onclick="salvarAssinatura()">✅ Confirmar Aceite</button>
 </div>
 
+
+<div class="form-container" style="padding-top:0;padding-bottom:0;margin-bottom:0">
+  <div class="cliente-banner">
+    <div class="cliente-banner-info">
+      <strong>📋 Orçamento para aprovação</strong>
+      <span>Analise os itens abaixo. Selecione o status do orçamento e assine digitalmente para confirmar.</span>
+    </div>
+    <div style="font-size:13px;color:#aab;text-align:right;flex-shrink:0">📱 <strong style="color:white">47 99248-2740</strong></div>
+  </div>
+</div>
 <div class="form-container">
 
   <!-- IDENTIFICAÇÃO -->
@@ -399,7 +467,7 @@
   </div>
 
   <!-- ACEITE DIGITAL -->
-  <div class="card">
+  <div class="card" id="aceiteSection">
     <div class="section-header"><div class="dot"></div> Aceite Digital</div>
     <div class="aceite-opts">
       <button class="aceite-btn" id="btnAprovado" onclick="selectAceite('aprovado')">
@@ -416,13 +484,23 @@
       </button>
     </div>
     <div class="fields" id="obsAceiteWrap" style="display:none">
-      <div class="field"><label>Observação do Aceite</label><textarea id="obsAceite" placeholder="Ex: Aprovado somente os serviços 1 e 2. Peças aguardam novo orçamento." rows="2"></textarea></div>
+      <div class="field"><label>Observação do Aceite</label><textarea id="obsAceite" class="campo-desbloqueado" placeholder="Ex: Aprovado somente os serviços 1 e 2. Peças aguardam novo orçamento." rows="2"></textarea></div>
     </div>
     <div class="fields" style="padding-top:0">
       <div class="row">
-        <div class="field w50"><label>Data do Aceite</label><input type="date" id="dataAceite"></div>
+        <div class="field w50" id="dataAceiteWrap"><label>Data do Aceite</label><input type="date" id="dataAceite" class="campo-desbloqueado"></div>
       </div>
     </div>
+  </div>
+
+  <div class="card" id="fotosCard">
+    <div class="section-header">
+      <div class="dot"></div> Fotos do Atendimento
+      <label class="sh-foto-label btn-enviar" for="fotoInput">📷 Adicionar Fotos</label>
+      <input type="file" id="fotoInput" accept="image/*" multiple style="display:none" onchange="addFotos(this.files)">
+    </div>
+    <div id="fotosGrid" class="fotos-grid"></div>
+    <div id="fotosVazia" class="foto-vazia">📷 Nenhuma foto adicionada.</div>
   </div>
 
   <!-- ASSINATURAS -->
@@ -444,11 +522,11 @@
         <div class="sig-title">Assinatura do Cliente</div>
         <div class="sig-canvas-wrap">
           <canvas class="sig-pad" id="sigCliente"></canvas>
-          <button class="sig-clear" onclick="clearSig('sigCliente')">Limpar</button>
+          <button class="sig-clear" class="clear-cliente" onclick="clearSig('sigCliente')">Limpar</button>
         </div>
         <div class="sig-fields">
-          <div class="field"><label>Nome</label><input type="text" id="nomeCliente" placeholder="Nome completo"></div>
-          <div class="field"><label>RG / CPF</label><input type="text" id="rgCliente" placeholder="000.000.000-00"></div>
+          <div class="field"><label>Nome</label><input type="text" id="nomeCliente" class="campo-desbloqueado" placeholder="Nome completo"></div>
+          <div class="field"><label>RG / CPF</label><input type="text" id="rgCliente" class="campo-desbloqueado" placeholder="000.000.000-00"></div>
         </div>
       </div>
     </div>
@@ -472,6 +550,8 @@
 <script>
   const JSONBIN_KEY = '$2a$10$jVSHixZhOZznf8d/PswF/OrearG8KxOykNPCrFxRkk8uq40uN4pE6';
   const JSONBIN_BASE = 'https://api.jsonbin.io/v3/b';
+  const ADMIN_SENHA = 'antunes2025';
+  let _binIdAtual = null;
 
   // INIT
   document.getElementById('dataEmissao').valueAsDate = new Date();
@@ -630,6 +710,8 @@
     d._pecas = pecas;
     d._sigTecnico = document.getElementById('sigTecnico').toDataURL();
     d._sigCliente = document.getElementById('sigCliente').toDataURL();
+    _fotos_col = _fotos;
+    d._fotos = _fotos;
     return d;
   }
 
@@ -682,6 +764,8 @@
         '👇 Toque para visualizar e assinar digitalmente:\n' +
         link + '\n\n' +
         '📞 47 99248-2740';
+      localStorage.setItem('lastBinIdOrc', binId);
+      localStorage.setItem('lastNumOrc', numOrc);
       showToast('✅ Orçamento salvo! Abrindo WhatsApp...');
       setTimeout(() => window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank'), 800);
     } catch(e) {
@@ -691,54 +775,219 @@
   }
 
   // CARREGAR DA URL
+  function preencherFormOrc(d) {
+    FIELD_IDS.forEach(id => { const el = document.getElementById(id); if (el && d[id] !== undefined) el.value = d[id]; });
+    if (d._aceite) selectAceite(d._aceite);
+    if (d._tipoDesconto) document.getElementById('tipoDesconto').value = d._tipoDesconto;
+    if (d._vTotal) document.getElementById('vTotal').textContent = d._vTotal;
+    if (d._servicos) {
+      const tbody = document.getElementById('servicosBody');
+      tbody.innerHTML = '';
+      d._servicos.forEach(row => { addServicoRow(); const last = tbody.lastElementChild; last.querySelectorAll('input').forEach((inp, i) => { if (row[i]) inp.value = row[i]; }); });
+    }
+    if (d._pecas) {
+      const tbody = document.getElementById('pecasBody');
+      tbody.innerHTML = '';
+      d._pecas.forEach(row => { addPecaRow(); const last = tbody.lastElementChild; last.querySelectorAll('input').forEach((inp, i) => { if (row[i]) inp.value = row[i]; }); });
+    }
+    function restoreSig(canvasId, dataURL) {
+      if (!dataURL || dataURL === 'data:,') return;
+      const canvas = document.getElementById(canvasId);
+      const img = new Image();
+      img.onload = () => { const ctx = canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img, 0, 0, canvas.width/devicePixelRatio, canvas.height/devicePixelRatio); };
+      img.src = dataURL;
+    }
+    if (d._sigTecnico) restoreSig('sigTecnico', d._sigTecnico);
+    if (d._sigCliente) restoreSig('sigCliente', d._sigCliente);
+    if (d._fotos) { _fotos = d._fotos; renderFotos(); }
+    atualizarValidade(); calcTotal();
+  }
+
   async function carregarDaURL() {
     const params = new URLSearchParams(window.location.search);
     const binId = params.get('orc');
     if (!binId) return;
+    _binIdAtual = binId;
+
+    // ── MODO ADMIN: ?orc=ID&admin=1 ──
+    if (params.get('admin') === '1') {
+      const senha = prompt('🔐 Senha de acesso administrativo:');
+      if (senha === ADMIN_SENHA) {
+        try {
+          showToast('🔓 Modo admin — carregando orçamento...');
+          const res = await fetch(JSONBIN_BASE + '/' + binId + '/latest', { headers: { 'X-Master-Key': JSONBIN_KEY } });
+          if (!res.ok) throw new Error();
+          const json = await res.json();
+          preencherFormOrc(json.record);
+          showToast('✅ Orçamento carregado em modo admin!');
+        } catch(e) { showToast('❌ Erro ao carregar orçamento.'); }
+        return;
+      } else {
+        alert('❌ Senha incorreta. Acesso negado.');
+        window.location.href = window.location.pathname;
+        return;
+      }
+    }
+
+    // ── MODO CLIENTE ──
+    document.body.classList.add('modo-cliente');
     try {
       showToast('Carregando orçamento...');
       const res = await fetch(JSONBIN_BASE + '/' + binId + '/latest', { headers: { 'X-Master-Key': JSONBIN_KEY } });
       if (!res.ok) throw new Error();
       const json = await res.json();
-      const d = json.record;
-      FIELD_IDS.forEach(id => { const el = document.getElementById(id); if (el && d[id] !== undefined) el.value = d[id]; });
-      if (d._aceite) selectAceite(d._aceite);
-      if (d._tipoDesconto) document.getElementById('tipoDesconto').value = d._tipoDesconto;
-      if (d._vTotal) document.getElementById('vTotal').textContent = d._vTotal;
-      if (d._servicos) {
-        const tbody = document.getElementById('servicosBody');
-        tbody.innerHTML = '';
-        d._servicos.forEach(row => {
-          addServicoRow();
-          const last = tbody.lastElementChild;
-          last.querySelectorAll('input').forEach((inp, i) => { if (row[i]) inp.value = row[i]; });
-        });
-      }
-      if (d._pecas) {
-        const tbody = document.getElementById('pecasBody');
-        tbody.innerHTML = '';
-        d._pecas.forEach(row => {
-          addPecaRow();
-          const last = tbody.lastElementChild;
-          last.querySelectorAll('input').forEach((inp, i) => { if (row[i]) inp.value = row[i]; });
-        });
-      }
-      function restoreSig(canvasId, dataURL) {
-        if (!dataURL || dataURL === 'data:,') return;
-        const canvas = document.getElementById(canvasId);
-        const img = new Image();
-        img.onload = () => { const ctx = canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img, 0, 0, canvas.width/devicePixelRatio, canvas.height/devicePixelRatio); };
-        img.src = dataURL;
-      }
-      if (d._sigTecnico) restoreSig('sigTecnico', d._sigTecnico);
-      if (d._sigCliente) restoreSig('sigCliente', d._sigCliente);
-      atualizarValidade();
-      calcTotal();
-      showToast('✅ Orçamento carregado!');
+      preencherFormOrc(json.record);
+      showToast('✅ Orçamento carregado! Selecione o aceite e assine abaixo.');
+      setTimeout(() => {
+        const sec = document.getElementById('aceiteSection');
+        if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 800);
     } catch(e) { showToast('❌ Erro ao carregar orçamento.'); }
   }
+
+  // SALVAR ACEITE + ASSINATURA (modo cliente)
+  async function salvarAssinatura() {
+    if (!aceiteAtual) { showToast('⚠️ Selecione Aprovado, Parcial ou Reprovado.'); return; }
+    const nome = document.getElementById('nomeCliente').value.trim();
+    if (!nome) { showToast('⚠️ Preencha seu nome antes de confirmar.'); return; }
+    const canvas = document.getElementById('sigCliente');
+    const pixel = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+    if (!pixel.some((v, i) => i % 4 !== 3 && v !== 0)) { showToast('⚠️ Por favor, assine no campo de assinatura.'); return; }
+    if (!_binIdAtual) { showToast('❌ ID do orçamento não encontrado.'); return; }
+    showToast('💾 Salvando aceite e assinatura...');
+    try {
+      const res = await fetch(JSONBIN_BASE + '/' + _binIdAtual + '/latest', { headers: { 'X-Master-Key': JSONBIN_KEY } });
+      if (!res.ok) throw new Error();
+      const dados = (await res.json()).record;
+      dados.nomeCliente   = document.getElementById('nomeCliente').value;
+      dados.rgCliente     = document.getElementById('rgCliente').value;
+      dados._aceite       = aceiteAtual;
+      dados._obsAceite    = document.getElementById('obsAceite') ? document.getElementById('obsAceite').value : '';
+      dados._dataAceite   = document.getElementById('dataAceite').value;
+      dados._sigCliente   = document.getElementById('sigCliente').toDataURL();
+      dados._assinadoEm   = new Date().toLocaleString('pt-BR');
+      const put = await fetch(JSONBIN_BASE + '/' + _binIdAtual, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_KEY },
+        body: JSON.stringify(dados)
+      });
+      if (!put.ok) throw new Error();
+      showToast('✅ Aceite confirmado! Obrigado.');
+    } catch(e) { showToast('❌ Erro ao salvar. Tente novamente.'); }
+  }
+
+  // REABRIR ORÇAMENTO
+  function reabrirORC() {
+    const salvo = localStorage.getItem('lastBinIdOrc');
+    const entrada = prompt('🔄 Reabrir orçamento em modo admin\n\nCole o link completo ou apenas o ID:', salvo || '');
+    if (!entrada || !entrada.trim()) return;
+    let binId = entrada.trim();
+    const match = binId.match(/[?&]orc=([a-zA-Z0-9]+)/);
+    if (match) binId = match[1];
+    if (!binId) { showToast('❌ ID não encontrado.'); return; }
+    const base = window.location.origin + window.location.pathname;
+    window.open(base + '?orc=' + binId + '&admin=1', '_blank');
+  }
+
   window.addEventListener('load', carregarDaURL);
 
+
+  // ===== FOTOS =====
+  let _fotos = [];
+  let _fotoIdx = 0;
+
+  async function addFotos(files) {
+    const MAX = 8;
+    const restantes = MAX - _fotos.length;
+    if (restantes <= 0) { showToast('⚠️ Limite de ' + MAX + ' fotos atingido.'); return; }
+    const lista = Array.from(files).slice(0, restantes);
+    showToast('📷 Comprimindo ' + lista.length + ' foto(s)...');
+    for (const file of lista) {
+      const url = await comprimirImg(file, 1100, 0.68);
+      _fotos.push(url);
+    }
+    document.getElementById('fotoInput').value = '';
+    renderFotos();
+    showToast('✅ ' + lista.length + ' foto(s) adicionada(s)!');
+  }
+
+  function comprimirImg(file, maxDim, quality) {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w >= h) { h = Math.round(h * maxDim / w); w = maxDim; }
+            else { w = Math.round(w * maxDim / h); h = maxDim; }
+          }
+          const c = document.createElement('canvas');
+          c.width = w; c.height = h;
+          c.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(c.toDataURL('image/jpeg', quality));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function renderFotos() {
+    const grid = document.getElementById('fotosGrid');
+    const vazia = document.getElementById('fotosVazia');
+    if (!grid) return;
+    if (_fotos.length === 0) {
+      grid.innerHTML = '';
+      if (vazia) vazia.style.display = 'block';
+      return;
+    }
+    if (vazia) vazia.style.display = 'none';
+    grid.innerHTML = _fotos.map((url, i) =>
+      `<div class="foto-thumb" onclick="abrirFoto(${i})">
+        <img src="${url}" alt="Foto ${i+1}">
+        <button class="foto-del" onclick="event.stopPropagation();removeFoto(${i})">✕</button>
+      </div>`
+    ).join('');
+  }
+
+  function removeFoto(i) {
+    if (!confirm('Remover esta foto?')) return;
+    _fotos.splice(i, 1);
+    renderFotos();
+  }
+
+  function abrirFoto(i) {
+    _fotoIdx = i;
+    const lb = document.getElementById('fotoLightbox');
+    const img = document.getElementById('fotoLbImg');
+    if (!lb || !img) return;
+    img.src = _fotos[i];
+    document.getElementById('fotoLbCounter').textContent = (i+1) + ' / ' + _fotos.length;
+    document.getElementById('fotoNavPrev').style.display = _fotos.length > 1 ? '' : 'none';
+    document.getElementById('fotoNavNext').style.display = _fotos.length > 1 ? '' : 'none';
+    lb.classList.add('open');
+  }
+
+  function navFoto(dir) {
+    _fotoIdx = (_fotoIdx + dir + _fotos.length) % _fotos.length;
+    abrirFoto(_fotoIdx);
+  }
+
+  function fecharFoto() {
+    document.getElementById('fotoLightbox').classList.remove('open');
+  }
+
+  document.addEventListener('keydown', e => {
+    const lb = document.getElementById('fotoLightbox');
+    if (!lb || !lb.classList.contains('open')) return;
+    if (e.key === 'Escape') fecharFoto();
+    if (e.key === 'ArrowLeft') navFoto(-1);
+    if (e.key === 'ArrowRight') navFoto(1);
+  });
+  document.getElementById('fotoLightbox')?.addEventListener('click', function(e) {
+    if (e.target === this) fecharFoto();
+  });
   // TOAST
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -746,5 +995,13 @@
     setTimeout(() => t.classList.remove('show'), 3500);
   }
 </script>
+
+<div class="foto-lb" id="fotoLightbox">
+  <button class="foto-lb-close" onclick="fecharFoto()">×</button>
+  <button class="foto-nav" id="fotoNavPrev" onclick="navFoto(-1)">‹</button>
+  <img src="" alt="Foto" id="fotoLbImg">
+  <button class="foto-nav" id="fotoNavNext" onclick="navFoto(1)">›</button>
+  <div class="foto-lb-counter" id="fotoLbCounter"></div>
+</div>
 </body>
 </html>
