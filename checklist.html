@@ -997,43 +997,36 @@
     if (restantes <= 0) { showToast('⚠️ Limite de ' + MAX + ' fotos atingido.'); return; }
     const lista = Array.from(files).slice(0, restantes);
     document.getElementById('fotoInput').value = '';
-    showToast('📤 Enviando ' + lista.length + ' foto(s)...');
     let ok = 0, fail = 0;
-    for (const file of lista) {
+
+    for (let i = 0; i < lista.length; i++) {
+      const file = lista[i];
+      showToast('📤 Enviando foto ' + (i+1) + ' de ' + lista.length + '...');
       try {
-        const b64 = await fileToBase64(file);
         const fd = new FormData();
-        fd.append('key', IMGBB_KEY);
-        fd.append('image', b64.split(',')[1]);
-        const res = await fetch('https://api.imgbb.com/1/upload', { method:'POST', body: fd });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
+        fd.append('image', file);
+        const res = await fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_KEY, {
+          method: 'POST',
+          body: fd
+        });
         const json = await res.json();
-        if (!json.success) throw new Error(json.error?.message || 'Falha');
+        if (!json.success) throw new Error(json.error?.message || 'Falha ImgBB');
         _fotos.push({
-          url:    json.data.url,
-          thumb:  json.data.thumb?.url || json.data.url,
-          del:    json.data.delete_url
+          url:   json.data.url,
+          thumb: json.data.thumb?.url || json.data.display_url || json.data.url,
+          del:   json.data.delete_url
         });
         ok++;
         renderFotos();
       } catch(e) {
         fail++;
-        console.error('ImgBB:', e);
+        console.error('ImgBB erro foto ' + (i+1) + ':', e);
+        showToast('❌ Foto ' + (i+1) + ' falhou: ' + e.message);
+        await new Promise(r => setTimeout(r, 1800));
       }
     }
-    const msg = ok > 0
-      ? '✅ ' + ok + ' foto(s) enviada(s)!' + (fail > 0 ? ' (' + fail + ' falhou)' : '')
-      : '❌ Erro ao enviar foto(s). Verifique a API key do ImgBB.';
-    showToast(msg);
-  }
 
-  function fileToBase64(file) {
-    return new Promise((res, rej) => {
-      const r = new FileReader();
-      r.onload = e => res(e.target.result);
-      r.onerror = () => rej(new Error('Leitura falhou'));
-      r.readAsDataURL(file);
-    });
+    if (ok > 0) showToast('✅ ' + ok + ' foto(s) enviada(s)!' + (fail ? ' | ' + fail + ' falhou' : ''));
   }
 
   function renderFotos() {
