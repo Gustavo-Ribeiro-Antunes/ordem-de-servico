@@ -496,7 +496,7 @@
   <div class="card" id="fotosCard">
     <div class="section-header">
       <div class="dot"></div> Fotos do Atendimento
-      <label class="sh-foto-label btn-enviar" for="fotoInput">📷 Adicionar Fotos</label>
+      <label class="sh-foto-label" for="fotoInput">📷 Adicionar Fotos</label>
       <input type="file" id="fotoInput" accept="image/*" multiple style="display:none" onchange="addFotos(this.files)">
     </div>
     <div id="fotosGrid" class="fotos-grid"></div>
@@ -799,7 +799,7 @@
     }
     if (d._sigTecnico) restoreSig('sigTecnico', d._sigTecnico);
     if (d._sigCliente) restoreSig('sigCliente', d._sigCliente);
-    if (d._fotos) { _fotos = d._fotos; renderFotos(); }
+    if (d._fotos && d._fotos.length) { _fotos = d._fotos; renderFotos(); }
     atualizarValidade(); calcTotal();
   }
 
@@ -937,7 +937,7 @@
     const grid = document.getElementById('fotosGrid');
     const vazia = document.getElementById('fotosVazia');
     if (!grid) return;
-    if (_fotos.length === 0) {
+    if (!_fotos || _fotos.length === 0) {
       grid.innerHTML = '';
       if (vazia) vazia.style.display = 'block';
       return;
