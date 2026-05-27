@@ -212,6 +212,30 @@
     body { background: white; }
     .card { box-shadow: none; border: 1px solid #ccc; }
   }
+
+  /* ===== FOTOS ===== */
+  .fotos-grid { display:flex; flex-wrap:wrap; gap:10px; padding:14px 16px; min-height:72px; align-items:flex-start; }
+  .foto-thumb { position:relative; width:88px; height:88px; border-radius:8px; overflow:hidden; border:1.5px solid var(--border); cursor:pointer; flex-shrink:0; }
+  .foto-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+  .foto-del { position:absolute; top:4px; right:4px; background:rgba(200,16,46,.88); color:white; border:none; border-radius:4px; font-size:12px; font-weight:900; cursor:pointer; padding:1px 6px; line-height:1.5; display:none; }
+  .foto-thumb:hover .foto-del { display:block; }
+  .foto-vazia { padding:18px 16px; text-align:center; color:var(--muted); font-size:13px; }
+  .sh-foto-label { background:rgba(255,255,255,.15); color:white; border:1px solid rgba(255,255,255,.4); border-radius:5px; padding:5px 13px; font-family:'Barlow',sans-serif; font-weight:700; font-size:12px; cursor:pointer; text-transform:uppercase; letter-spacing:.5px; margin-left:auto; user-select:none; }
+  .sh-foto-label:hover { background:rgba(255,255,255,.28); }
+  /* Modo cliente: oculta controles de edição de fotos */
+  body.modo-cliente .sh-foto-label { display:none !important; }
+  body.modo-cliente .foto-del { display:none !important; pointer-events:none !important; }
+  /* Lightbox */
+  .foto-lb { position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:500; display:none; align-items:center; justify-content:center; }
+  .foto-lb.open { display:flex; }
+  .foto-lb img { max-width:92vw; max-height:88vh; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.6); }
+  .foto-lb-close { position:absolute; top:14px; right:18px; background:none; border:none; color:rgba(255,255,255,.8); font-size:34px; cursor:pointer; font-weight:700; line-height:1; }
+  .foto-lb-close:hover { color:white; }
+  .foto-nav { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.15); border:none; color:white; font-size:26px; cursor:pointer; padding:10px 14px; border-radius:6px; }
+  .foto-nav:hover { background:rgba(255,255,255,.3); }
+  #fotoNavPrev { left:12px; }
+  #fotoNavNext { right:12px; }
+  .foto-lb-counter { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); color:rgba(255,255,255,.7); font-size:13px; font-weight:600; }
 </style>
 </head>
 <body>
@@ -445,6 +469,16 @@
     </div>
   </div>
 
+  <div class="card" id="fotosCard">
+    <div class="section-header">
+      <div class="dot"></div> Fotos do Atendimento
+      <label class="sh-foto-label btn-enviar" for="fotoInput">📷 Adicionar Fotos</label>
+      <input type="file" id="fotoInput" accept="image/*" multiple style="display:none" onchange="addFotos(this.files)">
+    </div>
+    <div id="fotosGrid" class="fotos-grid"></div>
+    <div id="fotosVazia" class="foto-vazia">📷 Nenhuma foto adicionada.</div>
+  </div>
+
   <div class="card">
     <div class="section-header"><div class="dot"></div> Assinaturas</div>
     <div class="sig-container">
@@ -603,6 +637,7 @@
     dados._sigTecnico = document.getElementById('sigTecnico').toDataURL();
 
     return dados;
+    dados._fotos = _fotos;
   }
 
   function restaurarAssinatura(canvasId, dataURL) {
@@ -640,6 +675,7 @@
     // Restaura assinaturas
     if (dados._sigCliente) restaurarAssinatura('sigCliente', dados._sigCliente);
     if (dados._sigTecnico) restaurarAssinatura('sigTecnico', dados._sigTecnico);
+    if (dados._fotos) { _fotos = dados._fotos; renderFotos(); }
   }
 
   // ===== CARREGAR DA URL =====
@@ -833,6 +869,103 @@
     window.open(base + '?os=' + binId + '&admin=1', '_blank');
   }
 
+
+  // ===== FOTOS =====
+  let _fotos = [];
+  let _fotoIdx = 0;
+
+  async function addFotos(files) {
+    const MAX = 8;
+    const restantes = MAX - _fotos.length;
+    if (restantes <= 0) { showToast('⚠️ Limite de ' + MAX + ' fotos atingido.'); return; }
+    const lista = Array.from(files).slice(0, restantes);
+    showToast('📷 Comprimindo ' + lista.length + ' foto(s)...');
+    for (const file of lista) {
+      const url = await comprimirImg(file, 1100, 0.68);
+      _fotos.push(url);
+    }
+    document.getElementById('fotoInput').value = '';
+    renderFotos();
+    showToast('✅ ' + lista.length + ' foto(s) adicionada(s)!');
+  }
+
+  function comprimirImg(file, maxDim, quality) {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w >= h) { h = Math.round(h * maxDim / w); w = maxDim; }
+            else { w = Math.round(w * maxDim / h); h = maxDim; }
+          }
+          const c = document.createElement('canvas');
+          c.width = w; c.height = h;
+          c.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(c.toDataURL('image/jpeg', quality));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function renderFotos() {
+    const grid = document.getElementById('fotosGrid');
+    const vazia = document.getElementById('fotosVazia');
+    if (!grid) return;
+    if (_fotos.length === 0) {
+      grid.innerHTML = '';
+      if (vazia) vazia.style.display = 'block';
+      return;
+    }
+    if (vazia) vazia.style.display = 'none';
+    grid.innerHTML = _fotos.map((url, i) =>
+      `<div class="foto-thumb" onclick="abrirFoto(${i})">
+        <img src="${url}" alt="Foto ${i+1}">
+        <button class="foto-del" onclick="event.stopPropagation();removeFoto(${i})">✕</button>
+      </div>`
+    ).join('');
+  }
+
+  function removeFoto(i) {
+    if (!confirm('Remover esta foto?')) return;
+    _fotos.splice(i, 1);
+    renderFotos();
+  }
+
+  function abrirFoto(i) {
+    _fotoIdx = i;
+    const lb = document.getElementById('fotoLightbox');
+    const img = document.getElementById('fotoLbImg');
+    if (!lb || !img) return;
+    img.src = _fotos[i];
+    document.getElementById('fotoLbCounter').textContent = (i+1) + ' / ' + _fotos.length;
+    document.getElementById('fotoNavPrev').style.display = _fotos.length > 1 ? '' : 'none';
+    document.getElementById('fotoNavNext').style.display = _fotos.length > 1 ? '' : 'none';
+    lb.classList.add('open');
+  }
+
+  function navFoto(dir) {
+    _fotoIdx = (_fotoIdx + dir + _fotos.length) % _fotos.length;
+    abrirFoto(_fotoIdx);
+  }
+
+  function fecharFoto() {
+    document.getElementById('fotoLightbox').classList.remove('open');
+  }
+
+  document.addEventListener('keydown', e => {
+    const lb = document.getElementById('fotoLightbox');
+    if (!lb || !lb.classList.contains('open')) return;
+    if (e.key === 'Escape') fecharFoto();
+    if (e.key === 'ArrowLeft') navFoto(-1);
+    if (e.key === 'ArrowRight') navFoto(1);
+  });
+  document.getElementById('fotoLightbox')?.addEventListener('click', function(e) {
+    if (e.target === this) fecharFoto();
+  });
   // ===== TOAST =====
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -840,5 +973,13 @@
     setTimeout(() => t.classList.remove('show'), 3500);
   }
 </script>
+
+<div class="foto-lb" id="fotoLightbox">
+  <button class="foto-lb-close" onclick="fecharFoto()">×</button>
+  <button class="foto-nav" id="fotoNavPrev" onclick="navFoto(-1)">‹</button>
+  <img src="" alt="Foto" id="fotoLbImg">
+  <button class="foto-nav" id="fotoNavNext" onclick="navFoto(1)">›</button>
+  <div class="foto-lb-counter" id="fotoLbCounter"></div>
+</div>
 </body>
 </html>
