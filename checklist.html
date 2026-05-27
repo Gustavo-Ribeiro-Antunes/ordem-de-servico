@@ -1000,15 +1000,17 @@
     let ok = 0, fail = 0;
 
     for (let i = 0; i < lista.length; i++) {
-      const file = lista[i];
       showToast('📤 Enviando foto ' + (i+1) + ' de ' + lista.length + '...');
       try {
+        // Comprime antes de enviar — essencial no mobile (fotos de câmera são muito grandes)
+        const blob = await comprimirBlob(lista[i], 1600, 0.82);
         const fd = new FormData();
-        fd.append('image', file);
+        fd.append('image', blob, 'foto.jpg');
         const res = await fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_KEY, {
           method: 'POST',
           body: fd
         });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
         const json = await res.json();
         if (!json.success) throw new Error(json.error?.message || 'Falha ImgBB');
         _fotos.push({
@@ -1020,13 +1022,40 @@
         renderFotos();
       } catch(e) {
         fail++;
-        console.error('ImgBB erro foto ' + (i+1) + ':', e);
+        console.error('ImgBB foto ' + (i+1) + ':', e);
         showToast('❌ Foto ' + (i+1) + ' falhou: ' + e.message);
         await new Promise(r => setTimeout(r, 1800));
       }
     }
-
     if (ok > 0) showToast('✅ ' + ok + ' foto(s) enviada(s)!' + (fail ? ' | ' + fail + ' falhou' : ''));
+  }
+
+  // Redimensiona e converte para Blob — funciona em desktop e mobile
+  function comprimirBlob(file, maxDim, quality) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Leitura falhou'));
+      reader.onload = e => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('Imagem inválida'));
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w >= h) { h = Math.round(h * maxDim / w); w = maxDim; }
+            else        { w = Math.round(w * maxDim / h); h = maxDim; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          canvas.toBlob(blob => {
+            if (blob) resolve(blob);
+            else reject(new Error('Compressão falhou'));
+          }, 'image/jpeg', quality);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
   }
 
   function renderFotos() {
