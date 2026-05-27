@@ -921,7 +921,7 @@
       const foto = _fotos[i];
       if (!foto._file) continue;
       try {
-        const blob = await comprimirBlob(foto._file, 1600, 0.82);
+        const blob = await comprimirBlob(foto._file, 1200, 0.72);
         const fd = new FormData();
         fd.append('image', blob, 'foto.jpg');
         const res = await fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_KEY, { method:'POST', body:fd });
